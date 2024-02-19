@@ -78,8 +78,8 @@ class BERTopicWrapper(TopicModel):
 
 
 @model_registry.register("BERTopic")
-def load_bertopic() -> Loader:
-    def _load(n_components: int, encoder, vectorizer: CountVectorizer):
+def load_bertopic(encoder, vectorizer: CountVectorizer) -> Loader:
+    def _load(n_components: int):
         model = BERTopic(
             embedding_model=encoder,
             vectorizer_model=vectorizer,

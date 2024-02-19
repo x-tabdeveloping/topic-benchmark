@@ -15,6 +15,6 @@ class TopicModel(Protocol):
         ...
 
 
-Loader = Callable[..., TopicModel]
+Loader = Callable[[int], TopicModel]
 
 Metric = Callable[[TopicData], float]
