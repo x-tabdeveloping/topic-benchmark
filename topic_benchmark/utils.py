@@ -1,5 +1,5 @@
 import numpy as np
-from turftopic import TopicData
+from turftopic.data import TopicData
 
 
 def get_top_k(data: TopicData, top_k: int = 10) -> list[list[str]]:

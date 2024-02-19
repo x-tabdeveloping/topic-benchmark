@@ -1,7 +1,7 @@
 from gensim.corpora import Dictionary
 from gensim.models.coherencemodel import CoherenceModel
 from gensim.utils import tokenize
-from turftopic import TopicData
+from turftopic.data import TopicData
 
 from topic_benchmark import metric_registry
 from topic_benchmark.base import Metric

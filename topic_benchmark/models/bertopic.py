@@ -20,15 +20,6 @@ class BERTopicWrapper(TopicModel):
     def prepare_topic_data(
         self, corpus: list[str], embeddings: Optional[np.ndarray] = None
     ) -> TopicData:
-        """Produces topic data for visualizations in topicwizard.
-
-        Parameters
-        ----------
-        corpus: list of str
-            Corpus to infer topic data for.
-        embeddings: ndarray of shape (n_documents, n_dimensions)
-            Contextual embeddings to use for topic discovery.
-        """
         from bertopic.backend._utils import select_backend
 
         if embeddings is None:
@@ -83,6 +74,7 @@ def load_bertopic(encoder, vectorizer: CountVectorizer) -> Loader:
         model = BERTopic(
             embedding_model=encoder,
             vectorizer_model=vectorizer,
+            nr_topics=n_components,
         )
         return BERTopicWrapper(model)
 

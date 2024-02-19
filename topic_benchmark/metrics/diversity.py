@@ -1,6 +1,6 @@
 from itertools import chain
 
-from turftopic import TopicData
+from turftopic.data import TopicData
 
 from topic_benchmark import metric_registry
 from topic_benchmark.base import Metric
