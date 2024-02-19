@@ -27,6 +27,7 @@ class TopicPipeline(Pipeline, TopicModel):
     def prepare_topic_data(
         self,
         corpus: List[str],
+        embeddings=None,
         document_representation: Literal["term", "topic"] = "term",
     ) -> TopicData:
         """Prepares topic data"""
