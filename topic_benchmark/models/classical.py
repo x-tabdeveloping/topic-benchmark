@@ -8,8 +8,8 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.pipeline import Pipeline, _name_estimators
 from turftopic.data import TopicData
 
-from topic_benchmark import model_registry
 from topic_benchmark.base import Loader, TopicModel
+from topic_benchmark.registries import model_registry
 
 
 class TopicPipeline(Pipeline, TopicModel):

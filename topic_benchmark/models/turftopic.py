@@ -4,8 +4,8 @@ from sklearn.feature_extraction.text import CountVectorizer
 from turftopic import (GMM, AutoEncodingTopicModel, KeyNMF,
                        SemanticSignalSeparation)
 
-from topic_benchmark import model_registry
 from topic_benchmark.base import Loader
+from topic_benchmark.registries import model_registry
 
 
 @model_registry.register("GMM")

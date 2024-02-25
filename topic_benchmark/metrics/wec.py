@@ -1,12 +1,11 @@
 import itertools
-from functools import partial
 
 import gensim.downloader as api
 import numpy as np
 from turftopic.data import TopicData
 
-from topic_benchmark import metric_registry
 from topic_benchmark.base import Metric
+from topic_benchmark.registries import metric_registry
 from topic_benchmark.utils import get_top_k
 
 
@@ -23,7 +22,7 @@ def word_embedding_coherence(topics, wv):
 
 
 @metric_registry.register("Word Embedding Coherence")
-def load_npmi() -> Metric:
+def load_wec() -> Metric:
     top_k = 10
     wv = api.load("word2vec-google-news-300")
 

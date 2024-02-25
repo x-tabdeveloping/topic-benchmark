@@ -1,1 +1,1 @@
-from topic_benchmark.datasets import *
+from topic_benchmark.datasets.newsgroups import *

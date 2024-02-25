@@ -5,9 +5,9 @@ from rich.progress import Progress
 from sklearn.base import clone
 from sklearn.feature_extraction.text import CountVectorizer
 
-from topic_benchmark import (dataset_registry, datasets, metric_registry,
-                             metrics, model_registry, models)
 from topic_benchmark.base import Loader
+from topic_benchmark.registries import (dataset_registry, metric_registry,
+                                        model_registry)
 
 
 class BenchmarkEntry(TypedDict):
@@ -26,7 +26,7 @@ def evaluate_model(
     for n_components in n_topics:
         model = loader(n_components=n_components)
         topic_data = model.prepare_topic_data(corpus, embeddings)
-        for metric_name, metric_loader in metric_registry.get_all():
+        for metric_name, metric_loader in metric_registry.get_all().items():
             if metric_name not in res:
                 res[metric_name] = []
             metric = metric_loader()
@@ -50,13 +50,13 @@ def run_benchmark(
         model_task = progress.add_task(
             "[cyan]Running Models...", total=n_models
         )
-        for dataset_name, dataset_loader in dataset_registry.get_all():
+        for dataset_name, dataset_loader in dataset_registry.get_all().items():
             progress.console.print(f"Working with {dataset_name}")
             progress.update(model_task, completed=0)
             progress.update(dataset_task, advance=1)
             corpus = dataset_loader()
             embeddings = encoder.encode(corpus)
-            for model_name, model_loader in model_registry.get_all():
+            for model_name, model_loader in model_registry.get_all().items():
                 progress.console.print(f"Evaluating {model_name}")
                 progress.update(model_task, advance=1)
                 loader = model_loader(

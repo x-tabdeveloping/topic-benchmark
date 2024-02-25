@@ -3,8 +3,8 @@ from gensim.models.coherencemodel import CoherenceModel
 from gensim.utils import tokenize
 from turftopic.data import TopicData
 
-from topic_benchmark import metric_registry
 from topic_benchmark.base import Metric
+from topic_benchmark.registries import metric_registry
 from topic_benchmark.utils import get_top_k
 
 
