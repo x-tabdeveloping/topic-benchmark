@@ -23,23 +23,3 @@ def load_s3(encoder, vectorizer: CountVectorizer) -> Loader:
     return partial(
         SemanticSignalSeparation, encoder=encoder, vectorizer=vectorizer
     )
-
-
-@model_registry.register("CombinedTM")
-def load_combined(encoder, vectorizer: CountVectorizer) -> Loader:
-    return partial(
-        AutoEncodingTopicModel,
-        encoder=encoder,
-        vectorizer=vectorizer,
-        combined=True,
-    )
-
-
-@model_registry.register("ZeroShotTM")
-def load_zeroshot(encoder, vectorizer: CountVectorizer) -> Loader:
-    return partial(
-        AutoEncodingTopicModel,
-        encoder=encoder,
-        vectorizer=vectorizer,
-        combined=False,
-    )
