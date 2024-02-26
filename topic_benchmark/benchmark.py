@@ -33,7 +33,8 @@ def evaluate_model(
             score = metric(topic_data)
             res[metric_name].append(score)
     return {
-        metric_name: np.mean(scores) for metric_name, scores in res.items()
+        metric_name: float(np.mean(scores))
+        for metric_name, scores in res.items()
     }
 
 
@@ -53,12 +54,10 @@ def run_benchmark(
         for dataset_name, dataset_loader in dataset_registry.get_all().items():
             progress.console.print(f"Working with {dataset_name}")
             progress.update(model_task, completed=0)
-            progress.update(dataset_task, advance=1)
             corpus = dataset_loader()
             embeddings = encoder.encode(corpus)
             for model_name, model_loader in model_registry.get_all().items():
                 progress.console.print(f"Evaluating {model_name}")
-                progress.update(model_task, advance=1)
                 loader = model_loader(
                     encoder=encoder, vectorizer=clone(vectorizer)
                 )
@@ -68,4 +67,6 @@ def run_benchmark(
                     dataset=dataset_name, model=model_name, results=scores
                 )
                 res.append(entry)
+                progress.update(model_task, advance=1)
+            progress.update(dataset_task, advance=1)
     return res
