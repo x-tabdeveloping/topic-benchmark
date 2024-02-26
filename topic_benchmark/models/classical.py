@@ -42,14 +42,16 @@ class TopicPipeline(Pipeline, TopicModel):
                     "Looks like the topic model is transductive. Running fit_transform()"
                 )
             document_topic_matrix = np.asarray(self.fit_transform(corpus))
+        topic_model = self.steps[-1][1]
+        vectorizer = self.steps[0][1]
         try:
-            components = self.topic_model.components_  # type: ignore
+            components = topic_model.components_  # type: ignore
         except AttributeError as e:
             raise ValueError(
                 "Topic model does not have components_ attribute."
             ) from e
-        document_term_matrix = self.vectorizer.transform(corpus)  # type: ignore
-        vocab = self.vectorizer.get_feature_names_out()  # type: ignore
+        document_term_matrix = vectorizer.transform(corpus)  # type: ignore
+        vocab = vectorizer.get_feature_names_out()  # type: ignore
         res = TopicData(
             corpus=corpus,
             document_term_matrix=document_term_matrix,
