@@ -17,12 +17,14 @@ def load_top2vec(encoder, vectorizer: CountVectorizer) -> Loader:
         metric="euclidean",
         cluster_selection_method="eom",
     )
-    _load = partial(
-        ClusteringTopicModel,
-        encoder=encoder,
-        vectorizer=vectorizer,
-        dimensionality_reduction=dim_red,
-        clustering=clustering,
-        feature_importance="centroid",
-    )
+
+    def _load(n_components: int):
+        return ClusteringTopicModel(
+            encoder=encoder,
+            vectorizer=vectorizer,
+            dimensionality_reduction=dim_red,
+            clustering=clustering,
+            feature_importance="centroid",
+        )
+
     return _load
