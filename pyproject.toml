@@ -1,0 +1,28 @@
+[tool.black]
+line-length=79
+
+[tool.poetry]
+name = "topic-benchmark"
+version = "0.1.0"
+description = "Benchmarking topic models for a paper"
+authors = ["Márton Kardos <power.up1163@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+numpy = "^1.23.0"
+scikit-learn = "^1.2.0"
+sentence-transformers = "^2.2.0"
+torch = "^2.1.0"
+scipy = "^1.10.0"
+rich = "^13.6.0"
+pyro-ppl = "^1.8.0"
+turftopic = "^0.2.9"
+bertopic = "^0.16.0"
+umap-learn = "^0.5.0"
+hdbscan = "^0.8.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
