@@ -1,4 +1,4 @@
-from typing import TypedDict
+from typing import Iterable, TypedDict
 
 import numpy as np
 from rich.progress import Progress
@@ -40,8 +40,7 @@ def evaluate_model(
 
 def run_benchmark(
     encoder, vectorizer: CountVectorizer
-) -> list[BenchmarkEntry]:
-    res = []
+) -> Iterable[BenchmarkEntry]:
     n_datasets = len(list(dataset_registry.get_all()))
     n_models = len(list(model_registry.get_all()))
     with Progress() as progress:
@@ -66,7 +65,6 @@ def run_benchmark(
                 entry = BenchmarkEntry(
                     dataset=dataset_name, model=model_name, results=scores
                 )
-                res.append(entry)
+                yield entry
                 progress.update(model_task, advance=1)
             progress.update(dataset_task, advance=1)
-    return res
