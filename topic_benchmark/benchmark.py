@@ -1,19 +1,27 @@
-from typing import Iterable, TypedDict
+from typing import Iterable, TypedDict, Union
 
 import numpy as np
-from rich.progress import Progress
 from sklearn.base import clone
 from sklearn.feature_extraction.text import CountVectorizer
 
 from topic_benchmark.base import Loader
-from topic_benchmark.registries import (dataset_registry, metric_registry,
-                                        model_registry)
+from topic_benchmark.registries import (
+    dataset_registry,
+    metric_registry,
+    model_registry,
+)
 
 
 class BenchmarkEntry(TypedDict):
     dataset: str
     model: str
     results: dict[str, float]
+
+
+class BenchmarkError(TypedDict):
+    dataset: str
+    model: str
+    error_message: str
 
 
 def evaluate_model(
@@ -40,7 +48,7 @@ def evaluate_model(
 
 def run_benchmark(
     encoder, vectorizer: CountVectorizer, done: set[tuple[str, str]]
-) -> Iterable[BenchmarkEntry]:
+) -> Iterable[Union[BenchmarkEntry, BenchmarkError]]:
     for dataset_name, dataset_loader in dataset_registry.get_all().items():
         print(f"Evaluating models on {dataset_name}")
         corpus = dataset_loader()
@@ -50,12 +58,19 @@ def run_benchmark(
                 print(f"Model {model_name} already done, skipping")
                 continue
             print(f"Evaluating {model_name}")
-            loader = model_loader(
-                encoder=encoder, vectorizer=clone(vectorizer)
-            )
-            n_topics = list(range(10, 51, 10))
-            scores = evaluate_model(corpus, embeddings, loader, n_topics)
-            entry = BenchmarkEntry(
-                dataset=dataset_name, model=model_name, results=scores
-            )
+            try:
+                loader = model_loader(
+                    encoder=encoder, vectorizer=clone(vectorizer)
+                )
+                n_topics = list(range(10, 51, 10))
+                scores = evaluate_model(corpus, embeddings, loader, n_topics)
+                entry = BenchmarkEntry(
+                    dataset=dataset_name, model=model_name, results=scores
+                )
+            except Exception as e:
+                entry = BenchmarkError(
+                    dataset=dataset_name,
+                    model=model_name,
+                    error_message=str(e),
+                )
             yield entry
