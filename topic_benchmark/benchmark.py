@@ -39,7 +39,7 @@ def evaluate_model(
 
 
 def run_benchmark(
-    encoder, vectorizer: CountVectorizer
+    encoder, vectorizer: CountVectorizer, done: set[tuple[str, str]]
 ) -> Iterable[BenchmarkEntry]:
     n_datasets = len(list(dataset_registry.get_all()))
     n_models = len(list(model_registry.get_all()))
@@ -56,6 +56,9 @@ def run_benchmark(
             corpus = dataset_loader()
             embeddings = encoder.encode(corpus)
             for model_name, model_loader in model_registry.get_all().items():
+                if (dataset_name, model_name) in done:
+                    progress.update(model_task, advance=1)
+                    continue
                 progress.console.print(f"Evaluating {model_name}")
                 loader = model_loader(
                     encoder=encoder, vectorizer=clone(vectorizer)
