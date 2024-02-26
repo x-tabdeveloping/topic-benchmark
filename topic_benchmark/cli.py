@@ -36,11 +36,13 @@ def run_cli(
             done = {
                 (entry["dataset"], entry["model"]) for entry in cached_entries
             }
+            mode = "a"
     except FileNotFoundError:
         done = set()
+        mode = "w"
     print("Running Benchmark.")
     entries = run_benchmark(encoder, vectorizer, done=done)
-    with open(out_path, "w") as out_file:
+    with open(out_path, mode) as out_file:
         for entry in entries:
             out_file.write(json.dumps(entry) + "\n")
     print("DONE")
