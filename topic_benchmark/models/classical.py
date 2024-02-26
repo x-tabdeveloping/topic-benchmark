@@ -32,7 +32,6 @@ class TopicPipeline(Pipeline, TopicModel):
     ) -> TopicData:
         """Prepares topic data"""
         try:
-            print("Inferring topical content for documents.")
             document_topic_matrix = np.asarray(self.transform(corpus))
         except (NotFittedError, AttributeError) as e:
             if e is NotFittedError:
