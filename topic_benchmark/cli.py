@@ -16,9 +16,7 @@ cli = Radicli()
     encoder_model=Arg("--encoder_model", "-e"),
     out_path=Arg("--out_file", "-o"),
 )
-def run_cli(
-    encoder_model: str = "all-MiniLM-L6-v2", out_path: Optional[str] = None
-):
+def run_cli(encoder_model: str = "all-MiniLM-L6-v2", out_path: Optional[str] = None):
     vectorizer = default_vectorizer()
     print("Loading Encoder.")
     encoder = SentenceTransformer(encoder_model)
@@ -33,16 +31,14 @@ def run_cli(
             cached_entries: list[BenchmarkEntry] = [
                 json.loads(line) for line in cache_file
             ]
-            done = {
-                (entry["dataset"], entry["model"]) for entry in cached_entries
-            }
-            mode = "a"
+            done = {(entry["dataset"], entry["model"]) for entry in cached_entries}
     except FileNotFoundError:
+        with open(out_path, "w") as out_file:
+            out_file.write("")
         done = set()
-        mode = "w"
     print("Running Benchmark.")
     entries = run_benchmark(encoder, vectorizer, done=done)
-    with open(out_path, mode) as out_file:
-        for entry in entries:
+    for entry in entries:
+        with open(out_path, "a") as out_file:
             out_file.write(json.dumps(entry) + "\n")
     print("DONE")
