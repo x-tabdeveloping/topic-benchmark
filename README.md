@@ -16,5 +16,5 @@ Just Benchmarking Topic Models :)
 ```bash
 pip install topic-benchmark
 
-python3 -m topic_benchmark run
+python3 -m topic_benchmark run -e "embedding_model_name"
 ```
