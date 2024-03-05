@@ -1,6 +1,6 @@
 from gensim.corpora import Dictionary
 from gensim.models.coherencemodel import CoherenceModel
-from gensim.utils import tokenize
+from sklearn.feature_extraction.text import CountVectorizer
 from turftopic.data import TopicData
 
 from topic_benchmark.base import Metric
@@ -14,7 +14,8 @@ def load_npmi() -> Metric:
 
     def score(data: TopicData):
         topics = get_top_k(data, top_k)
-        texts = [list(tokenize(text, lower=True)) for text in data["corpus"]]
+        tokenizer = CountVectorizer(vocabulary=data["vocab"]).build_analyzer()
+        texts = [tokenizer(text) for text in data["corpus"]]
         dictionary = Dictionary(texts)
         cm = CoherenceModel(
             topics=topics,
