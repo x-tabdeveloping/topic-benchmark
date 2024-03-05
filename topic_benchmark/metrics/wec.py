@@ -17,8 +17,8 @@ def word_embedding_coherence(topics, wv):
             for word1, word2 in itertools.combinations(topic, 2):
                 if word1 in wv.index_to_key and word2 in wv.index_to_key:
                     local_simi.append(wv.similarity(word1, word2))
-            arrays.append(np.mean(local_simi))
-    return np.mean(arrays)
+            arrays.append(np.nanmean(local_simi))
+    return np.nanmean(arrays)
 
 
 @metric_registry.register("Word Embedding Coherence")
