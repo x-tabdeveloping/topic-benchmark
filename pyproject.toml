@@ -3,7 +3,7 @@ line-length=79
 
 [tool.poetry]
 name = "topic-benchmark"
-version = "0.2.0"
+version = "0.2.1"
 description = "Benchmarking topic models for a paper"
 authors = ["Márton Kardos <power.up1163@gmail.com>"]
 license = "MIT"
@@ -24,6 +24,7 @@ hdbscan = "^0.8.0"
 catalogue = "^2.0.0"
 gensim = "^4.3.2"
 radicli = "^0.0.25"
+pandas = "^2.1.0"
 
 [build-system]
 requires = ["poetry-core"]
