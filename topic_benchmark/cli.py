@@ -7,6 +7,7 @@ from sentence_transformers import SentenceTransformer
 
 from topic_benchmark.benchmark import BenchmarkEntry, run_benchmark
 from topic_benchmark.defaults import default_vectorizer
+from topic_benchmark.table import produce_latex_table
 
 cli = Radicli()
 
@@ -42,3 +43,20 @@ def run_cli(encoder_model: str = "all-MiniLM-L6-v2", out_path: Optional[str] = N
         with open(out_path, "a") as out_file:
             out_file.write(json.dumps(entry) + "\n")
     print("DONE")
+
+
+@cli.command(
+    "table",
+    results_file=Arg(help="JSONL file containing benchmark results."),
+    out_path=Arg("--out_file", "-o"),
+)
+def make_cli(results_file: str, out_path: Optional[str] = None):
+    with open(results_file) as in_file:
+        # Allows for comments if we want to exclude models.
+        entries = [json.loads(line) for line in in_file if not line.startswith("#")]
+    table = produce_latex_table(entries)
+    if out_path is None:
+        print(table)
+    else:
+        with open(out_path, "w") as out_file:
+            out_file.write(table)
