@@ -32,7 +32,10 @@ def run_cli(encoder_model: str = "all-MiniLM-L6-v2", out_path: Optional[str] = N
             cached_entries: list[BenchmarkEntry] = [
                 json.loads(line) for line in cache_file
             ]
-            done = {(entry["dataset"], entry["model"]) for entry in cached_entries}
+            done = {
+                (entry["dataset"], entry["model"], entry["n_topics"])
+                for entry in cached_entries
+            }
     except FileNotFoundError:
         with open(out_path, "w") as out_file:
             out_file.write("")
