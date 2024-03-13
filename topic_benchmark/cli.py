@@ -7,6 +7,7 @@ from sentence_transformers import SentenceTransformer
 
 from topic_benchmark.benchmark import BenchmarkEntry, run_benchmark
 from topic_benchmark.defaults import default_vectorizer
+from topic_benchmark.figures import produce_figures
 from topic_benchmark.table import produce_latex_table
 
 cli = Radicli()
@@ -67,3 +68,14 @@ def make_table(results_file: str, out_path: Optional[str] = None):
     else:
         with open(out_path, "w") as out_file:
             out_file.write(table)
+
+
+@cli.command(
+    "figures",
+    results_file=Arg(help="JSONL file containing benchmark results."),
+    out_dir=Arg(
+        "--out_dir", "-o", help="Directory where the figures should be placed."
+    ),
+)
+def make_figures(results_file: str, out_dir: str = "figures"):
+    produce_figures(results_file, out_dir)

@@ -28,6 +28,7 @@ catalogue = "^2.0.0"
 gensim = "^4.3.2"
 radicli = "^0.0.25"
 pandas = "^2.1.0"
+plotly = "^5.18.0"
 
 [build-system]
 requires = ["poetry-core"]
