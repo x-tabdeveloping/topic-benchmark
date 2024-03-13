@@ -17,7 +17,9 @@ cli = Radicli()
     encoder_model=Arg("--encoder_model", "-e"),
     out_path=Arg("--out_file", "-o"),
 )
-def run_cli(encoder_model: str = "all-MiniLM-L6-v2", out_path: Optional[str] = None):
+def run_cli(
+    encoder_model: str = "all-MiniLM-L6-v2", out_path: Optional[str] = None
+):
     vectorizer = default_vectorizer()
     print("Loading Encoder.")
     encoder = SentenceTransformer(encoder_model)
@@ -53,10 +55,12 @@ def run_cli(encoder_model: str = "all-MiniLM-L6-v2", out_path: Optional[str] = N
     results_file=Arg(help="JSONL file containing benchmark results."),
     out_path=Arg("--out_file", "-o"),
 )
-def make_cli(results_file: str, out_path: Optional[str] = None):
+def make_table(results_file: str, out_path: Optional[str] = None):
     with open(results_file) as in_file:
         # Allows for comments if we want to exclude models.
-        entries = [json.loads(line) for line in in_file if not line.startswith("#")]
+        entries = [
+            json.loads(line) for line in in_file if not line.startswith("#")
+        ]
     table = produce_latex_table(entries)
     if out_path is None:
         print(table)

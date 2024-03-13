@@ -14,7 +14,9 @@ def produce_header(datasets: list[str]) -> list[str]:
         end = start + 2
         midrule = f"\\cmidrule(l{{3pt}}r{{3pt}}){{{start}-{end}}}"
         midrules.append(midrule)
-    metric_names = " & " + " & ".join(["NPMI", "WEC", "Diversity"] * n_datasets)
+    metric_names = " & " + " & ".join(
+        ["NPMI", "WEC", "Diversity"] * n_datasets
+    )
     lines = [
         "\\begin{table}[h]",
         "\\bgroup",
@@ -24,7 +26,8 @@ def produce_header(datasets: list[str]) -> list[str]:
         "\\toprule",
         " & "
         + " & ".join(
-            f"\\multicolumn{{3}}{{c}}{{\\textbf{{{dataset}}}}}" for dataset in datasets
+            f"\\multicolumn{{3}}{{c}}{{\\textbf{{{dataset}}}}}"
+            for dataset in datasets
         )
         + "\\\\",
         " ".join(midrules),
@@ -34,22 +37,12 @@ def produce_header(datasets: list[str]) -> list[str]:
     return lines
 
 
-def group_by_dataset(entries: list[BenchmarkEntry]) -> dict[str, pd.DataFrame]:
-    res = {}
-    for entry in entries:
-        if entry["dataset"] not in res:
-            res[entry["dataset"]] = []
-        res[entry["dataset"]].append({"model": entry["model"], **entry["results"]})
-    return {
-        dataset: pd.DataFrame.from_records(records).set_index("model")
-        for dataset, records in res.items()
-    }
-
-
 def format_cells(table: pd.DataFrame) -> pd.DataFrame:
+    table = table[["NPMI Coherence", "Word Embedding Coherence", "Diversity"]]
     bold = {column: table[column].max() for column in table.columns}
     underline = {
-        column: table[column].nlargest(n=2).iloc[-1] for column in table.columns
+        column: table[column].nlargest(n=2).iloc[-1]
+        for column in table.columns
     }
     records = []
     for model, row in table.iterrows():
@@ -81,6 +74,7 @@ MODEL_ORDER = [
 
 
 def produce_body(groups: list[pd.DataFrame]) -> list[str]:
+    groups = [group.reset_index().set_index("model") for group in groups]
     models = set()
     for group in groups:
         models |= set(group.index)
@@ -112,11 +106,20 @@ def produce_footer() -> list[str]:
     ]
 
 
-def produce_latex_table(entries: list[Union[BenchmarkEntry, BenchmarkError]]) -> str:
+def produce_latex_table(
+    entries: list[Union[BenchmarkEntry, BenchmarkError]],
+) -> str:
     entries = [entry for entry in entries if "error_message" not in entry]
-    groups = group_by_dataset(entries)
-    group_names = list(groups.keys())
-    group_tables = [groups[group] for group in group_names]
+    data = pd.DataFrame.from_records(entries)
+    data = data.join(pd.json_normalize(data["results"]))
+    data = data.groupby(["dataset", "model"])[
+        [
+            "NPMI Coherence",
+            "Word Embedding Coherence",
+            "Diversity",
+        ]
+    ].mean()
+    group_names, group_tables = zip(*data.groupby("dataset"))
     lines = [
         *produce_header(group_names),
         *produce_body(group_tables),
