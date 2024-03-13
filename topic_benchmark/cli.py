@@ -1,4 +1,5 @@
 import json
+import warnings
 from pathlib import Path
 from typing import Optional
 
@@ -9,6 +10,7 @@ from topic_benchmark.benchmark import BenchmarkEntry, run_benchmark
 from topic_benchmark.defaults import default_vectorizer
 from topic_benchmark.figures import produce_figures
 from topic_benchmark.table import produce_latex_table
+from topic_benchmark.registries import encoder_registry
 
 cli = Radicli()
 
@@ -22,11 +24,23 @@ def run_cli(
     encoder_model: str = "all-MiniLM-L6-v2", out_path: Optional[str] = None
 ):
     vectorizer = default_vectorizer()
+
     print("Loading Encoder.")
-    encoder = SentenceTransformer(encoder_model)
+    # first try to load encoder from registry
+    # if not found, assume encoder is a sentence transformer
+    try:
+        encoder = encoder_registry.get(encoder_model)
+    except:
+        encoder = SentenceTransformer(encoder_model)
+        warnings.warn(
+            f"`{encoder_model}`: encoder model not found in registry. "
+            "Loading using `SentenceTransformer`"
+        )
+
     if out_path is None:
         encoder_path_name = encoder_model.replace("/", "__")
         out_path = f"results/{encoder_path_name}.jsonl"
+
     out_dir = Path(out_path).parent
     out_dir.mkdir(exist_ok=True, parents=True)
     try:
