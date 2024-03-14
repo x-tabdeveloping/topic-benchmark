@@ -27,11 +27,9 @@ def run_cli(
     vectorizer = default_vectorizer()
 
     print("Loading Encoder.")
-    # first try to load encoder from registry
-    # if not found, assume encoder is a sentence transformer
-    try:
+    if encoder_model in encoder_registry:
         encoder = encoder_registry.get(encoder_model)
-    except RegistryError:
+    else:
         encoder = SentenceTransformer(encoder_model)
         warnings.warn(
             f"`{encoder_model}`: encoder model not found in registry. "
