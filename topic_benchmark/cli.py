@@ -3,14 +3,15 @@ import warnings
 from pathlib import Path
 from typing import Optional
 
+from catalogue import RegistryError
 from radicli import Arg, Radicli
 from sentence_transformers import SentenceTransformer
 
 from topic_benchmark.benchmark import BenchmarkEntry, run_benchmark
 from topic_benchmark.defaults import default_vectorizer
 from topic_benchmark.figures import produce_figures
-from topic_benchmark.table import produce_latex_table
 from topic_benchmark.registries import encoder_registry
+from topic_benchmark.table import produce_latex_table
 
 cli = Radicli()
 
@@ -30,7 +31,7 @@ def run_cli(
     # if not found, assume encoder is a sentence transformer
     try:
         encoder = encoder_registry.get(encoder_model)
-    except:
+    except RegistryError:
         encoder = SentenceTransformer(encoder_model)
         warnings.warn(
             f"`{encoder_model}`: encoder model not found in registry. "
