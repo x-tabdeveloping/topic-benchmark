@@ -37,6 +37,20 @@ def produce_header(datasets: list[str]) -> list[str]:
     return lines
 
 
+def produce_footer() -> list[str]:
+    return [
+        "\\bottomrule",
+        "\\label{table:evaluation}",
+        "\\end{tabular}",
+        "}",
+        "\\egroup",
+        "\\caption{ Coherence and Diversity of Topics over Multiple Datasets \\\\",
+        "\\textit{Best in bold, second best underlined}",
+        "}",
+        "\\end{table}",
+    ]
+
+
 def format_cells(table: pd.DataFrame) -> pd.DataFrame:
     table = table[["NPMI Coherence", "Word Embedding Coherence", "Diversity"]]
     bold = {column: table[column].max() for column in table.columns}
@@ -72,6 +86,18 @@ MODEL_ORDER = [
     "LDA",
 ]
 
+EMBEDDING_ORDER = [
+    "average_word_embeddings_glove.6B.300d",
+    "all-MiniLM-L6-v2",
+    "all-mpnet-base-v2",
+    "intfloat/e5-large-v2",
+]
+
+DATASET_ORDER = [
+    "20 Newsgroups Preprocessed",
+    "20 Newsgroups Raw",
+]
+
 
 def produce_body(groups: list[pd.DataFrame]) -> list[str]:
     groups = [group.reset_index().set_index("model") for group in groups]
@@ -92,23 +118,14 @@ def produce_body(groups: list[pd.DataFrame]) -> list[str]:
     return lines
 
 
-def produce_footer() -> list[str]:
-    return [
-        "\\bottomrule",
-        "\\label{table:evaluation}",
-        "\\end{tabular}",
-        "}",
-        "\\egroup",
-        "\\caption{ Coherence and Diversity of Topics over Multiple Datasets \\\\",
-        "\\textit{Best in bold, second best underlined}",
-        "}",
-        "\\end{table}",
-    ]
-
-
-def produce_latex_table(
+def produce_encoder_rows(
     entries: list[Union[BenchmarkEntry, BenchmarkError]],
-) -> str:
+    encoder_name: str,
+) -> list[str]:
+    """Produces lines in a table for a single embedding model."""
+    encoder_name = encoder_name.replace(
+        "_", "\\_"
+    )  # Escaping underscores for LaTex
     entries = [entry for entry in entries if "error_message" not in entry]
     data = pd.DataFrame.from_records(entries)
     data = data.join(pd.json_normalize(data["results"]))
@@ -119,10 +136,26 @@ def produce_latex_table(
             "Diversity",
         ]
     ].mean()
-    group_names, group_tables = zip(*data.groupby("dataset"))
+    groups = dict(list(data.groupby("dataset")))
+    # Loading tables in proper order
+    group_tables = [groups[dataset] for dataset in DATASET_ORDER]
     lines = [
-        *produce_header(group_names),
+        "\\midrule",
+        f"\\textbf{{{encoder_name}}} & & & & & & \\\\",
+        "\\midrule",
         *produce_body(group_tables),
-        *produce_footer(),
     ]
+    return lines
+
+
+def produce_full_table(
+    encoder_entries: dict[str, Union[BenchmarkEntry, BenchmarkError]],
+) -> str:
+    """Produces full table for all encoder models."""
+    lines = [*produce_header(DATASET_ORDER)]
+    for encoder in EMBEDDING_ORDER:
+        if encoder not in encoder_entries:
+            continue
+        lines.extend(produce_encoder_rows(encoder_entries[encoder], encoder))
+    lines.extend(produce_footer())
     return "\n".join(lines)
