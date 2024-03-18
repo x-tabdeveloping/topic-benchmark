@@ -16,6 +16,7 @@ from topic_benchmark.figures import (
 )
 from topic_benchmark.registries import encoder_registry
 from topic_benchmark.table import produce_full_table
+from topic_benchmark.registries import encoder_registry
 
 cli = Radicli()
 
@@ -32,10 +33,10 @@ def run_cli(
 
     print("Loading Encoder.")
     if encoder_model in encoder_registry:
-        encoder = encoder_registry.get(encoder_model)
+        encoder = encoder_registry.get(encoder_model)()
     else:
         encoder = SentenceTransformer(encoder_model)
-        warnings.warn(
+        print(
             f"`{encoder_model}`: encoder model not found in registry. "
             "Loading using `SentenceTransformer`"
         )
