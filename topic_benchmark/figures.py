@@ -1,8 +1,31 @@
-from pathlib import Path
-
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 from sklearn.feature_extraction._stop_words import ENGLISH_STOP_WORDS
+
+CATEGORY_ORDERS = {
+    "dataset": [
+        "20 Newsgroups Preprocessed",
+        "20 Newsgroups Raw",
+    ],
+    "model": [
+        "NMF",
+        "LDA",
+        "S³",
+        "KeyNMF",
+        "GMM",
+        "Top2Vec",
+        "BERTopic",
+        "CombinedTM",
+        "ZeroShotTM",
+    ],
+    "encoder": [
+        "average_word_embeddings_glove.6B.300d",
+        "all-MiniLM-L6-v2",
+        "all-mpnet-base-v2",
+        "intfloat/e5-large-v2",
+    ],
+}
 
 
 def count_stop_words(topics: list[list[str]]) -> int:
@@ -24,46 +47,59 @@ def count_nonalphabetical(topics: list[list[str]]) -> int:
     return res
 
 
-def produce_figures(results_file: str, out_dir: str):
-    out_dir = Path(out_dir)
-    out_dir.mkdir(exist_ok=True)
-    data = pd.read_json(results_file, orient="records", lines=True)
+def plot_stop_words(data: pd.DataFrame) -> go.Figure:
     data = data[data["dataset"] == "20 Newsgroups Raw"]
-    data["n_stop_words"] = data["topic_descriptions"].map(count_stop_words)
-    data["n_nonalphabetical"] = data["topic_descriptions"].map(
-        count_nonalphabetical
+    data = data.assign(
+        n_stop_words=data["topic_descriptions"].map(count_stop_words),
     )
-    print("Producing Stop Words figure.")
     fig = px.line(
         data,
         color="model",
         x="n_topics",
         y="n_stop_words",
         template="plotly_white",
+        category_orders=CATEGORY_ORDERS,
+        facet_col="encoder",
+        color_discrete_sequence=px.colors.qualitative.Pastel,
     )
     fig = fig.update_traces(line=dict(width=3))
     fig = fig.update_layout(width=1000, height=800)
-    fig.write_image(out_dir.joinpath("stop_words.png"), scale=2)
-    print("Producing Nonalphabetical figure.")
+    return fig
+
+
+def plot_nonalphabetical(data: pd.DataFrame) -> go.Figure:
+    data = data[data["dataset"] == "20 Newsgroups Raw"]
+    data = data.assign(
+        n_nonalphabetical=data["topic_descriptions"].map(
+            count_nonalphabetical
+        ),
+    )
     fig = px.line(
         data,
         color="model",
         x="n_topics",
         y="n_nonalphabetical",
+        category_orders=CATEGORY_ORDERS,
+        facet_col="encoder",
         template="plotly_white",
+        color_discrete_sequence=px.colors.qualitative.Pastel,
     )
     fig = fig.update_traces(line=dict(width=3))
     fig = fig.update_layout(width=1000, height=800)
-    fig.write_image(out_dir.joinpath("n_nonalphabetical.png"), scale=2)
-    print("Producing Speed figure.")
-    fig = px.line(
+    return fig
+
+
+def plot_speed(data: pd.DataFrame) -> go.Figure:
+    fig = px.box(
         data,
         color="model",
-        facet_col="dataset",
-        x="n_topics",
+        facet_row="dataset",
+        facet_col="encoder",
         y="runtime_s",
         template="plotly_white",
+        color_discrete_sequence=px.colors.qualitative.Pastel,
+        category_orders=CATEGORY_ORDERS,
     )
     fig = fig.update_traces(line=dict(width=3))
     fig = fig.update_layout(width=1000, height=800)
-    fig.write_image(out_dir.joinpath("speed.png"), scale=2)
+    return fig
