@@ -4,11 +4,11 @@ import plotly.graph_objects as go
 from sklearn.feature_extraction._stop_words import ENGLISH_STOP_WORDS
 
 CATEGORY_ORDERS = {
-    "dataset": [
+    "Dataset": [
         "20 Newsgroups Preprocessed",
         "20 Newsgroups Raw",
     ],
-    "model": [
+    "Model": [
         "NMF",
         "LDA",
         "S³",
@@ -19,8 +19,8 @@ CATEGORY_ORDERS = {
         "CombinedTM",
         "ZeroShotTM",
     ],
-    "encoder": [
-        "average_word_embeddings_glove.6B.300d",
+    "Encoder": [
+        "GloVe",
         "all-MiniLM-L6-v2",
         "all-mpnet-base-v2",
         "intfloat/e5-large-v2",
@@ -51,61 +51,74 @@ def rel_freq_nonalphabetical(topics: list[list[str]]) -> int:
     return res / total
 
 
-def plot_stop_words(data: pd.DataFrame) -> go.Figure:
-    data = data[data["dataset"] == "20 Newsgroups Raw"]
-    data = data.assign(
-        rel_freq_stop_words=data["topic_descriptions"].map(
-            rel_freq_stop_words
-        ),
+def preprocess_for_plotting(data: pd.DataFrame) -> pd.DataFrame:
+    data = data.copy()
+    data = data.rename(
+        columns={
+            "model": "Model",
+            "encoder": "Encoder",
+            "dataset": "Dataset",
+            "n_topics": "Number of Topics",
+            "runtime_s": "Runtime in Seconds",
+        }
     )
+    data["Relative Frequency of Nonalphabetical Terms"] = data[
+        "topic_descriptions"
+    ].map(rel_freq_nonalphabetical)
+    data["Relative Frequency of Stop Words"] = data["topic_descriptions"].map(
+        rel_freq_stop_words
+    )
+    data["Encoder"] = data["Encoder"].replace(
+        {"average_word_embeddings_glove.6B.300d": "GloVe"}
+    )
+    return data
+
+
+def plot_stop_words(data: pd.DataFrame) -> go.Figure:
+    data = data[data["Dataset"] == "20 Newsgroups Raw"]
     fig = px.line(
         data,
-        color="model",
-        x="n_topics",
-        y="rel_freq_stop_words",
+        color="Model",
+        x="Number of Topics",
+        y="Relative Frequency of Stop Words",
         template="plotly_white",
         category_orders=CATEGORY_ORDERS,
-        facet_col="encoder",
+        facet_col="Encoder",
         color_discrete_sequence=px.colors.qualitative.Pastel,
     )
     fig = fig.update_traces(line=dict(width=3))
-    fig = fig.update_layout(width=1000, height=800)
+    fig = fig.update_layout(width=900, height=400)
     return fig
 
 
 def plot_nonalphabetical(data: pd.DataFrame) -> go.Figure:
-    data = data[data["dataset"] == "20 Newsgroups Raw"]
-    data = data.assign(
-        rel_freq_nonalphabetical=data["topic_descriptions"].map(
-            rel_freq_nonalphabetical
-        ),
-    )
+    data = data[data["Dataset"] == "20 Newsgroups Raw"]
     fig = px.line(
         data,
-        color="model",
-        x="n_topics",
-        y="rel_freq_nonalphabetical",
+        color="Model",
+        x="Number of Topics",
+        y="Relative Frequency of Nonalphabetical Terms",
         category_orders=CATEGORY_ORDERS,
-        facet_col="encoder",
+        facet_col="Encoder",
         template="plotly_white",
         color_discrete_sequence=px.colors.qualitative.Pastel,
     )
     fig = fig.update_traces(line=dict(width=3))
-    fig = fig.update_layout(width=1000, height=800)
+    fig = fig.update_layout(width=1400, height=600)
     return fig
 
 
 def plot_speed(data: pd.DataFrame) -> go.Figure:
     fig = px.box(
         data,
-        color="model",
-        facet_row="dataset",
-        facet_col="encoder",
-        y="runtime_s",
+        color="Model",
+        facet_row="Dataset",
+        facet_col="Encoder",
+        y="Runtime in Seconds",
         template="plotly_white",
         color_discrete_sequence=px.colors.qualitative.Pastel,
         category_orders=CATEGORY_ORDERS,
     )
     fig = fig.update_traces(line=dict(width=3))
-    fig = fig.update_layout(width=1000, height=800)
+    fig = fig.update_layout(width=1000, height=600, margin=dict(b=0))
     return fig
