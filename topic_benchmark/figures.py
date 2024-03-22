@@ -28,35 +28,41 @@ CATEGORY_ORDERS = {
 }
 
 
-def count_stop_words(topics: list[list[str]]) -> int:
+def rel_freq_stop_words(topics: list[list[str]]) -> int:
     stops = set(ENGLISH_STOP_WORDS)
     res = 0
+    total = 0
     for topic in topics:
         for word in topic:
+            total += 1
             if word in stops:
                 res += 1
-    return res
+    return res / total
 
 
-def count_nonalphabetical(topics: list[list[str]]) -> int:
+def rel_freq_nonalphabetical(topics: list[list[str]]) -> int:
     res = 0
+    total = 0
     for topic in topics:
         for word in topic:
+            total += 1
             if not word.isalpha():
                 res += 1
-    return res
+    return res / total
 
 
 def plot_stop_words(data: pd.DataFrame) -> go.Figure:
     data = data[data["dataset"] == "20 Newsgroups Raw"]
     data = data.assign(
-        n_stop_words=data["topic_descriptions"].map(count_stop_words),
+        rel_freq_stop_words=data["topic_descriptions"].map(
+            rel_freq_stop_words
+        ),
     )
     fig = px.line(
         data,
         color="model",
         x="n_topics",
-        y="n_stop_words",
+        y="rel_freq_stop_words",
         template="plotly_white",
         category_orders=CATEGORY_ORDERS,
         facet_col="encoder",
@@ -70,15 +76,15 @@ def plot_stop_words(data: pd.DataFrame) -> go.Figure:
 def plot_nonalphabetical(data: pd.DataFrame) -> go.Figure:
     data = data[data["dataset"] == "20 Newsgroups Raw"]
     data = data.assign(
-        n_nonalphabetical=data["topic_descriptions"].map(
-            count_nonalphabetical
+        rel_freq_nonalphabetical=data["topic_descriptions"].map(
+            rel_freq_nonalphabetical
         ),
     )
     fig = px.line(
         data,
         color="model",
         x="n_topics",
-        y="n_nonalphabetical",
+        y="rel_freq_nonalphabetical",
         category_orders=CATEGORY_ORDERS,
         facet_col="encoder",
         template="plotly_white",
