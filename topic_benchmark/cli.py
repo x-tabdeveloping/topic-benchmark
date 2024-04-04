@@ -13,10 +13,10 @@ from topic_benchmark.figures import (
     plot_nonalphabetical,
     plot_speed,
     plot_stop_words,
+    preprocess_for_plotting,
 )
 from topic_benchmark.registries import encoder_registry
 from topic_benchmark.table import produce_full_table
-from topic_benchmark.registries import encoder_registry
 
 cli = Radicli()
 
@@ -130,6 +130,7 @@ def make_figures(
         df["encoder"] = file.stem.replace("__", "/")
         dfs.append(df)
     data = pd.concat(dfs)
+    data = preprocess_for_plotting(data)
     figures = {
         "n_nonalphabetical": plot_nonalphabetical,
         "speed": plot_speed,
@@ -138,6 +139,6 @@ def make_figures(
     for figure_name, produce in figures.items():
         fig = produce(data)
         out_path = out_dir.joinpath(f"{figure_name}.png")
-        fig.write_image(out_path, scale=2)
+        fig.write_image(out_path, scale=3)
         if show_figures:
             fig.show()
