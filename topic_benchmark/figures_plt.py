@@ -29,7 +29,7 @@ CATEGORY_ORDERS = {
     ],
 }
 
-SCALE = 2
+SCALE = 2.5
 
 plt.rcParams.update(
     {
@@ -43,6 +43,8 @@ plt.rcParams.update(
         "ytick.labelsize": 9 * SCALE,
         "legend.fontsize": 9 * SCALE,
         "axes.titlesize": 10 * SCALE,
+        "figure.titlesize": 10.5 * SCALE,
+        "figure.labelsize": 10.5 * SCALE,
         "axes.linewidth": 1,
     }
 )
@@ -156,8 +158,8 @@ def plot_stop_words(data):
     fill_facet(df2, 2)
     fill_facet(df3, 3)
 
-    fig.supxlabel("Number of Topics", size=22, x=0.45)
-    fig.supylabel("RF of Stop Words", size=22, x=-0.004)
+    fig.supxlabel("Number of Topics", x=0.45)
+    fig.supylabel("RF of Stop Words", x=-0.004)
 
     legend_handles = [
         Patch(facecolor=models2colors[model], label=model)
@@ -224,8 +226,8 @@ def plot_nonalphabetical(data):
     fill_facet(df2, 2)
     fill_facet(df3, 3)
 
-    fig.supxlabel("Number of Topics", size=22, x=0.45)
-    fig.supylabel("RF of Non-alphabetical Terms", size=22, x=-0.004)
+    fig.supxlabel("Number of Topics", x=0.45)
+    fig.supylabel("RF of Non-alphabetical Terms", x=-0.004)
 
     legend_handles = [
         Patch(facecolor=models2colors[model], label=model)
