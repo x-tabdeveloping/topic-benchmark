@@ -11,15 +11,13 @@ CATEGORY_ORDERS = {
         "20 Newsgroups Raw",
     ],
     "Model": [
-        "NMF",
-        "LDA",
         "S³",
-        "KeyNMF",
-        "GMM",
         "Top2Vec",
         "BERTopic",
         "CombinedTM",
         "ZeroShotTM",
+        "NMF",
+        "LDA",
     ],
     "Encoder": [
         "GloVe",
@@ -50,29 +48,21 @@ plt.rcParams.update(
 )
 
 models2colors = {
-    "NMF": "#66C5CC",
-    "LDA": "#F6CF71",
     "S³": "#F89C74",
-    "KeyNMF": "#DCB0F2",
-    "GMM": "#87C55F",
     "Top2Vec": "#9EB9F3",
     "BERTopic": "#FE88B1",
     "CombinedTM": "#C9DB74",
     "ZeroShotTM": "#8BE0A4",
+    "NMF": "#66C5CC",
+    "LDA": "#F6CF71",
 }
 
-# models2colors = {
-#     "NMF": "#729E9C",
-#     "LDA": "#E4C1F9",
-#     "S³": "#FFD97D",
-#     "KeyNMF": "#A5D8FF",
-#     "GMM": "#F1935C",
-#     "Top2Vec": "#85C7F2",
-#     "BERTopic": "#F6A6FF",
-#     "CombinedTM": "#FAE7CB",
-#     "ZeroShotTM": "#B0DEA0"
-# }
-
+encoder2colors = {
+    "GloVe": "black",
+    "all-MiniLM-L6-v2": "red",
+    "all-mpnet-base-v2": "blue",
+    "intfloat/e5-large-v2": "green",
+}
 
 
 def rel_freq_stop_words(topics: list[list[str]]) -> int:
@@ -243,16 +233,42 @@ def plot_speed_aggregated(data):
 
 def plot_speed(data):
 
+    SCALE = 3
+    plt.rcParams.update(
+        {
+            "text.usetex": False,
+            "font.family": "Times New Roman",
+            "font.serif": "serif",
+            "mathtext.fontset": "cm",
+            "axes.unicode_minus": False,
+            "axes.labelsize": 9 * SCALE,
+            "xtick.labelsize": 9 * SCALE,
+            "ytick.labelsize": 9 * SCALE,
+            "legend.fontsize": 9 * SCALE,
+            "axes.titlesize": 10 * SCALE,
+            "figure.titlesize": 10.5 * SCALE,
+            "figure.labelsize": 10.5 * SCALE,
+            "axes.linewidth": 1,
+        }
+    )
+
+    # drop some models
+    forbidden_models = ["KeyNMF", "GMM", "NMF"]
+    data = data.query("Model != @forbidden_models")
+    MODEL_ORDER = CATEGORY_ORDERS["Model"]
+    MODEL_ORDER = [m for m in MODEL_ORDER if m not in forbidden_models]
+
     data_raw = data[data["Dataset"] == "20 Newsgroups Raw"]
     data_pro = data[data["Dataset"] == "20 Newsgroups Preprocessed"]
 
-    fig, axs = plt.subplots(ncols=4, figsize=(20, 5))
 
-    # facet: encoder
-    # x: n topics, y: processing speed, color: model
+    fig, axs = plt.subplots(ncols=len(MODEL_ORDER), figsize=(25, 5))
+
+    # facet: model
+    # x: n topics, y: processing speed, color: encoder
     def fill_facet(df, ax_i, line_style="-"):
-        for i, group in df.groupby("Model"):
-            group_c = models2colors[group["Model"].tolist()[0]]
+        for i, group in df.groupby("Encoder"):
+            group_c = encoder2colors[group["Encoder"].tolist()[0]]
             axs[ax_i].plot(
                 "Number of Topics",
                 "Runtime in Seconds",
@@ -260,13 +276,13 @@ def plot_speed(data):
                 data=group,
                 c=group_c,
             )
-        axs[ax_i].set_title(CATEGORY_ORDERS["Encoder"][ax_i])
+        axs[ax_i].set_title(MODEL_ORDER[ax_i])
         axs[ax_i].set_ylim(-1, 15_000)
         axs[ax_i].set_xticks(np.arange(10, 60, step=10))
 
-    for ax_i, encoder_tag in enumerate(CATEGORY_ORDERS["Encoder"]):
-        sub_raw = data_raw[data_raw["Encoder"] == encoder_tag]
-        sub_pro = data_pro[data_pro["Encoder"] == encoder_tag]
+    for ax_i, model_tag in enumerate(MODEL_ORDER):
+        sub_raw = data_raw[data_raw["Model"] == model_tag]
+        sub_pro = data_pro[data_pro["Model"] == model_tag]
         fill_facet(sub_raw, ax_i, line_style="--")
         fill_facet(sub_pro, ax_i, line_style="-")
 
@@ -274,8 +290,8 @@ def plot_speed(data):
     fig.supylabel("Runtime (s)", x=-0.004)
 
     legend_handles = [
-        Patch(facecolor=models2colors[model], label=model)
-        for model in CATEGORY_ORDERS["Model"]
+        Patch(facecolor=encoder2colors[encoder], label=encoder)
+        for encoder in CATEGORY_ORDERS["Encoder"]
     ]
     plt.legend(
         handles=legend_handles,
