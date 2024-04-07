@@ -27,34 +27,14 @@ CATEGORY_ORDERS = {
     ],
 }
 
-SCALE = 2.5
-
-plt.rcParams.update(
-    {
-        "text.usetex": False,
-        "font.family": "Times New Roman",
-        "font.serif": "serif",
-        "mathtext.fontset": "cm",
-        "axes.unicode_minus": False,
-        "axes.labelsize": 9 * SCALE,
-        "xtick.labelsize": 9 * SCALE,
-        "ytick.labelsize": 9 * SCALE,
-        "legend.fontsize": 9 * SCALE,
-        "axes.titlesize": 10 * SCALE,
-        "figure.titlesize": 10.5 * SCALE,
-        "figure.labelsize": 10.5 * SCALE,
-        "axes.linewidth": 1,
-    }
-)
-
 models2colors = {
-    "S³": "#F89C74",
-    "Top2Vec": "#9EB9F3",
-    "BERTopic": "#FE88B1",
-    "CombinedTM": "#C9DB74",
-    "ZeroShotTM": "#8BE0A4",
-    "NMF": "#66C5CC",
-    "LDA": "#F6CF71",
+    "S³": "#5D5DE6",
+    "Top2Vec": "#BD4F6C",
+    "BERTopic": "#D7816A",
+    "CombinedTM": "#F0CF65",
+    "ZeroShotTM": "#DDEDAA",
+    "NMF": "#B5B2C2",
+    "LDA": "#806D40",
 }
 
 encoder2colors = {
@@ -63,6 +43,26 @@ encoder2colors = {
     "all-mpnet-base-v2": "blue",
     "intfloat/e5-large-v2": "green",
 }
+
+
+def set_plt_params(SCALE):
+    plt.rcParams.update(
+        {
+            "text.usetex": False,
+            "font.family": "Times New Roman",
+            "font.serif": "serif",
+            "mathtext.fontset": "cm",
+            "axes.unicode_minus": False,
+            "axes.labelsize": 9 * SCALE,
+            "xtick.labelsize": 9 * SCALE,
+            "ytick.labelsize": 9 * SCALE,
+            "legend.fontsize": 9 * SCALE,
+            "axes.titlesize": 10 * SCALE,
+            "figure.titlesize": 10.5 * SCALE,
+            "figure.labelsize": 10.5 * SCALE,
+            "axes.linewidth": 1,
+        }
+    )
 
 
 def rel_freq_stop_words(topics: list[list[str]]) -> int:
@@ -113,6 +113,8 @@ def preprocess_for_plotting(data: pd.DataFrame) -> pd.DataFrame:
 
 def plot_stop_words(data):
 
+    set_plt_params(SCALE=3)
+
     data = data[data["Dataset"] == "20 Newsgroups Raw"]
 
     df0 = data[data["Encoder"] == CATEGORY_ORDERS["Encoder"][0]]
@@ -124,7 +126,7 @@ def plot_stop_words(data):
 
     # fill in the facets
     def fill_facet(df, ax_i):
-        axs[ax_i].grid(visible=True, which="major", axis="y", linewidth=0.3)
+        axs[ax_i].grid(visible=True, which="major", axis="y", linewidth=0.5)
 
         for i, group in df.groupby("Model"):
             group_c = models2colors[group["Model"].tolist()[0]]
@@ -132,6 +134,7 @@ def plot_stop_words(data):
                 "Number of Topics",
                 "Relative Frequency of Stop Words",
                 "-",
+                linewidth=3,
                 data=group,
                 c=group_c,
             )
@@ -140,11 +143,20 @@ def plot_stop_words(data):
             df["Number of Topics"],
             df["Relative Frequency of Stop Words"],
             c=df["Model"].map(models2colors).tolist(),
+            s=40,
         )
         axs[ax_i].set_title(CATEGORY_ORDERS["Encoder"][ax_i])
         axs[ax_i].set_ylim(-0.05, 0.85)
         axs[ax_i].set_yticks(np.arange(0, 1, step=0.2))
         axs[ax_i].set_xticks(np.arange(10, 60, step=10))
+
+        if ax_i > 0:
+            axs[ax_i].yaxis.set_ticklabels([])
+            for tick in axs[ax_i].yaxis.get_major_ticks():
+                tick.tick1line.set_visible(False)
+                tick.tick2line.set_visible(False)
+                tick.label1.set_visible(False)
+                tick.label2.set_visible(False)
 
     fill_facet(df0, 0)
     fill_facet(df1, 1)
@@ -171,6 +183,8 @@ def plot_stop_words(data):
 
 def plot_nonalphabetical(data):
 
+    set_plt_params(SCALE=3)
+
     data = data[data["Dataset"] == "20 Newsgroups Raw"]
 
     df0 = data[data["Encoder"] == CATEGORY_ORDERS["Encoder"][0]]
@@ -182,7 +196,7 @@ def plot_nonalphabetical(data):
 
     # fill in the facets
     def fill_facet(df, ax_i):
-        axs[ax_i].grid(visible=True, which="major", axis="y", linewidth=0.3)
+        axs[ax_i].grid(visible=True, which="major", axis="y", linewidth=0.5)
 
         for i, group in df.groupby("Model"):
             group_c = models2colors[group["Model"].tolist()[0]]
@@ -190,6 +204,7 @@ def plot_nonalphabetical(data):
                 "Number of Topics",
                 "Relative Frequency of Nonalphabetical Terms",
                 "-",
+                linewidth=3,
                 data=group,
                 c=group_c,
             )
@@ -198,11 +213,20 @@ def plot_nonalphabetical(data):
             df["Number of Topics"],
             df["Relative Frequency of Nonalphabetical Terms"],
             c=df["Model"].map(models2colors).tolist(),
+            s=40,
         )
         axs[ax_i].set_title(CATEGORY_ORDERS["Encoder"][ax_i])
         axs[ax_i].set_ylim(-0.02, 0.32)
         axs[ax_i].set_yticks(np.arange(0, 0.4, step=0.1))
         axs[ax_i].set_xticks(np.arange(10, 60, step=10))
+
+        if ax_i > 0:
+            axs[ax_i].yaxis.set_ticklabels([])
+            for tick in axs[ax_i].yaxis.get_major_ticks():
+                tick.tick1line.set_visible(False)
+                tick.tick2line.set_visible(False)
+                tick.label1.set_visible(False)
+                tick.label2.set_visible(False)
 
     fill_facet(df0, 0)
     fill_facet(df1, 1)
@@ -233,24 +257,7 @@ def plot_speed_aggregated(data):
 
 def plot_speed(data):
 
-    SCALE = 3
-    plt.rcParams.update(
-        {
-            "text.usetex": False,
-            "font.family": "Times New Roman",
-            "font.serif": "serif",
-            "mathtext.fontset": "cm",
-            "axes.unicode_minus": False,
-            "axes.labelsize": 9 * SCALE,
-            "xtick.labelsize": 9 * SCALE,
-            "ytick.labelsize": 9 * SCALE,
-            "legend.fontsize": 9 * SCALE,
-            "axes.titlesize": 10 * SCALE,
-            "figure.titlesize": 10.5 * SCALE,
-            "figure.labelsize": 10.5 * SCALE,
-            "axes.linewidth": 1,
-        }
-    )
+    set_plt_params(SCALE=3.5)
 
     # drop some models
     forbidden_models = ["KeyNMF", "GMM", "NMF"]
@@ -267,18 +274,33 @@ def plot_speed(data):
     # facet: model
     # x: n topics, y: processing speed, color: encoder
     def fill_facet(df, ax_i, line_style="-"):
+
+        axs[ax_i].grid(visible=True, which="major", axis="y", linewidth=0.5)
+
         for i, group in df.groupby("Encoder"):
             group_c = encoder2colors[group["Encoder"].tolist()[0]]
             axs[ax_i].plot(
                 "Number of Topics",
                 "Runtime in Seconds",
                 line_style,
+                linewidth=2,
                 data=group,
                 c=group_c,
             )
         axs[ax_i].set_title(MODEL_ORDER[ax_i])
         axs[ax_i].set_ylim(-1, 15_000)
         axs[ax_i].set_xticks(np.arange(10, 60, step=10))
+        axs[ax_i].set_yticks(np.arange(0, 17_500, step=2500))
+        axs[ax_i].xaxis.set_tick_params(labelsize=28)
+        axs[ax_i].yaxis.set_tick_params(labelsize=20)
+
+        if ax_i > 0:
+            axs[ax_i].yaxis.set_ticklabels([])
+            for tick in axs[ax_i].yaxis.get_major_ticks():
+                tick.tick1line.set_visible(False)
+                tick.tick2line.set_visible(False)
+                tick.label1.set_visible(False)
+                tick.label2.set_visible(False)
 
     for ax_i, model_tag in enumerate(MODEL_ORDER):
         sub_raw = data_raw[data_raw["Model"] == model_tag]
