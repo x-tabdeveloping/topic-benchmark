@@ -61,6 +61,19 @@ models2colors = {
     "ZeroShotTM": "#8BE0A4",
 }
 
+# models2colors = {
+#     "NMF": "#729E9C",
+#     "LDA": "#E4C1F9",
+#     "S³": "#FFD97D",
+#     "KeyNMF": "#A5D8FF",
+#     "GMM": "#F1935C",
+#     "Top2Vec": "#85C7F2",
+#     "BERTopic": "#F6A6FF",
+#     "CombinedTM": "#FAE7CB",
+#     "ZeroShotTM": "#B0DEA0"
+# }
+
+
 
 def rel_freq_stop_words(topics: list[list[str]]) -> int:
     stops = set(ENGLISH_STOP_WORDS)
@@ -118,16 +131,6 @@ def plot_stop_words(data):
     df3 = data[data["Encoder"] == CATEGORY_ORDERS["Encoder"][3]]
 
     fig, axs = plt.subplots(ncols=4, figsize=(20, 5))
-
-    for i, group in df0.groupby("Model"):
-        group_c = models2colors[group["Model"].tolist()[0]]
-        axs[0].plot(
-            "Number of Topics",
-            "Relative Frequency of Stop Words",
-            "-",
-            data=group,
-            c=group_c,
-        )
 
     # fill in the facets
     def fill_facet(df, ax_i):
@@ -187,16 +190,6 @@ def plot_nonalphabetical(data):
 
     fig, axs = plt.subplots(ncols=4, figsize=(20, 5))
 
-    for i, group in df0.groupby("Model"):
-        group_c = models2colors[group["Model"].tolist()[0]]
-        axs[0].plot(
-            "Number of Topics",
-            "Relative Frequency of Nonalphabetical Terms",
-            "-",
-            data=group,
-            c=group_c,
-        )
-
     # fill in the facets
     def fill_facet(df, ax_i):
         axs[ax_i].grid(visible=True, which="major", axis="y", linewidth=0.3)
@@ -244,5 +237,53 @@ def plot_nonalphabetical(data):
     return fig
 
 
-def plot_speed(data):
+def plot_speed_aggregated(data):
     return plt.figure()
+
+
+def plot_speed(data):
+
+    data_raw = data[data["Dataset"] == "20 Newsgroups Raw"]
+    data_pro = data[data["Dataset"] == "20 Newsgroups Preprocessed"]
+
+    fig, axs = plt.subplots(ncols=4, figsize=(20, 5))
+
+    # facet: encoder
+    # x: n topics, y: processing speed, color: model
+    def fill_facet(df, ax_i, line_style="-"):
+        for i, group in df.groupby("Model"):
+            group_c = models2colors[group["Model"].tolist()[0]]
+            axs[ax_i].plot(
+                "Number of Topics",
+                "Runtime in Seconds",
+                line_style,
+                data=group,
+                c=group_c,
+            )
+        axs[ax_i].set_title(CATEGORY_ORDERS["Encoder"][ax_i])
+        axs[ax_i].set_ylim(-1, 15_000)
+        axs[ax_i].set_xticks(np.arange(10, 60, step=10))
+
+    for ax_i, encoder_tag in enumerate(CATEGORY_ORDERS["Encoder"]):
+        sub_raw = data_raw[data_raw["Encoder"] == encoder_tag]
+        sub_pro = data_pro[data_pro["Encoder"] == encoder_tag]
+        fill_facet(sub_raw, ax_i, line_style="--")
+        fill_facet(sub_pro, ax_i, line_style="-")
+
+    fig.supxlabel("Number of Topics", x=0.45)
+    fig.supylabel("Runtime (s)", x=-0.004)
+
+    legend_handles = [
+        Patch(facecolor=models2colors[model], label=model)
+        for model in CATEGORY_ORDERS["Model"]
+    ]
+    plt.legend(
+        handles=legend_handles,
+        loc="center left",
+        bbox_to_anchor=(1.05, 0.5),
+        frameon=False,
+    )
+
+    plt.tight_layout()
+
+    return fig
