@@ -340,26 +340,53 @@ def plot_speed_v2(data):
     data_raw = data[data["Dataset"] == "20 Newsgroups Raw"]
     data_pro = data[data["Dataset"] == "20 Newsgroups Preprocessed"]
 
-
-    fig, axs = plt.subplots(nrows=2, ncols=6, figsize=(25, 10))
+    fig, axs = plt.subplots(nrows=2, ncols=4, figsize=(25, 10))
 
     # facet: encoder
     # x: n topics, y: processing speed, color: model
-    def fill_facet_rowdy(df, ax_i, row, line_style="-"):
+    def fill_facet_upper_row(df, ax_i, row, line_style="-"):
 
         axs[row][ax_i].grid(visible=True, which="major", axis="y", linewidth=0.5)
 
-        for i, group in df.groupby("Encoder"):
-            group_c = encoder2colors[group["Encoder"].tolist()[0]]
+        for i, group in df.groupby("Model"):
+            group_c = models2colors[group["Model"].tolist()[0]]
             axs[row][ax_i].plot(
                 "Number of Topics",
                 "Runtime in Seconds",
                 line_style,
-                linewidth=2,
+                linewidth=4,
                 data=group,
                 c=group_c,
             )
-        axs[row][ax_i].set_title(MODEL_ORDER[ax_i])
+        axs[row][ax_i].set_title(CATEGORY_ORDERS["Encoder"][ax_i])
+        axs[row][ax_i].set_ylim(-1, 6000)
+        axs[row][ax_i].set_xticks(np.arange(10, 60, step=10))
+        axs[row][ax_i].set_yticks(np.arange(0, 7000, step=1000))
+        axs[row][ax_i].xaxis.set_tick_params(labelsize=28)
+        axs[row][ax_i].yaxis.set_tick_params(labelsize=20)
+
+        if ax_i > 0:
+            axs[row][ax_i].yaxis.set_ticklabels([])
+            for tick in axs[row][ax_i].yaxis.get_major_ticks():
+                tick.tick1line.set_visible(False)
+                tick.tick2line.set_visible(False)
+                tick.label1.set_visible(False)
+                tick.label2.set_visible(False)
+
+    def fill_facet_lower_row(df, ax_i, row, line_style="-"):
+
+        axs[row][ax_i].grid(visible=True, which="major", axis="y", linewidth=0.5)
+
+        for i, group in df.groupby("Model"):
+            group_c = models2colors[group["Model"].tolist()[0]]
+            axs[row][ax_i].plot(
+                "Number of Topics",
+                "Runtime in Seconds",
+                line_style,
+                linewidth=4,
+                data=group,
+                c=group_c,
+            )
         axs[row][ax_i].set_ylim(-1, 15_000)
         axs[row][ax_i].set_xticks(np.arange(10, 60, step=10))
         axs[row][ax_i].set_yticks(np.arange(0, 17_500, step=2500))
@@ -375,21 +402,21 @@ def plot_speed_v2(data):
                 tick.label2.set_visible(False)
 
     # upper row
-    for ax_i, model_tag in enumerate(MODEL_ORDER):
-        sub_pro = data_pro[data_pro["Model"] == model_tag]
-        fill_facet_rowdy(sub_pro, ax_i, row=0)
+    for ax_i, encoder_tag in enumerate(CATEGORY_ORDERS["Encoder"]):
+        sub_pro = data_pro[data_pro["Encoder"] == encoder_tag]
+        fill_facet_upper_row(sub_pro, ax_i, row=0)
 
     # lower row
-    for ax_i, model_tag in enumerate(MODEL_ORDER):
-        sub_raw = data_raw[data_raw["Model"] == model_tag]
-        fill_facet_rowdy(sub_raw, ax_i, row=1)
+    for ax_i, encoder_tag in enumerate(CATEGORY_ORDERS["Encoder"]):
+        sub_raw = data_raw[data_raw["Encoder"] == encoder_tag]
+        fill_facet_lower_row(sub_raw, ax_i, row=1)
 
     fig.supxlabel("Number of Topics", x=0.45)
     fig.supylabel("Runtime (s)", x=-0.004)
 
     legend_handles = [
-        Patch(facecolor=encoder2colors[encoder], label=encoder)
-        for encoder in CATEGORY_ORDERS["Encoder"]
+        Patch(facecolor=models2colors[model], label=model)
+        for model in CATEGORY_ORDERS["Model"]
     ]
     plt.legend(
         handles=legend_handles,
