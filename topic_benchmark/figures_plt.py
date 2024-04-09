@@ -325,3 +325,79 @@ def plot_speed(data):
     plt.tight_layout()
 
     return fig
+
+
+def plot_speed_v2(data):
+
+    set_plt_params(SCALE=3.5)
+
+    # drop some models
+    forbidden_models = ["KeyNMF", "GMM", "NMF"]
+    data = data.query("Model != @forbidden_models")
+    MODEL_ORDER = CATEGORY_ORDERS["Model"]
+    MODEL_ORDER = [m for m in MODEL_ORDER if m not in forbidden_models]
+
+    data_raw = data[data["Dataset"] == "20 Newsgroups Raw"]
+    data_pro = data[data["Dataset"] == "20 Newsgroups Preprocessed"]
+
+
+    fig, axs = plt.subplots(nrows=2, ncols=6, figsize=(25, 10))
+
+    # facet: encoder
+    # x: n topics, y: processing speed, color: model
+    def fill_facet_rowdy(df, ax_i, row, line_style="-"):
+
+        axs[row][ax_i].grid(visible=True, which="major", axis="y", linewidth=0.5)
+
+        for i, group in df.groupby("Encoder"):
+            group_c = encoder2colors[group["Encoder"].tolist()[0]]
+            axs[row][ax_i].plot(
+                "Number of Topics",
+                "Runtime in Seconds",
+                line_style,
+                linewidth=2,
+                data=group,
+                c=group_c,
+            )
+        axs[row][ax_i].set_title(MODEL_ORDER[ax_i])
+        axs[row][ax_i].set_ylim(-1, 15_000)
+        axs[row][ax_i].set_xticks(np.arange(10, 60, step=10))
+        axs[row][ax_i].set_yticks(np.arange(0, 17_500, step=2500))
+        axs[row][ax_i].xaxis.set_tick_params(labelsize=28)
+        axs[row][ax_i].yaxis.set_tick_params(labelsize=20)
+
+        if ax_i > 0:
+            axs[row][ax_i].yaxis.set_ticklabels([])
+            for tick in axs[row][ax_i].yaxis.get_major_ticks():
+                tick.tick1line.set_visible(False)
+                tick.tick2line.set_visible(False)
+                tick.label1.set_visible(False)
+                tick.label2.set_visible(False)
+
+    # upper row
+    for ax_i, model_tag in enumerate(MODEL_ORDER):
+        sub_pro = data_pro[data_pro["Model"] == model_tag]
+        fill_facet_rowdy(sub_pro, ax_i, row=0)
+
+    # lower row
+    for ax_i, model_tag in enumerate(MODEL_ORDER):
+        sub_raw = data_raw[data_raw["Model"] == model_tag]
+        fill_facet_rowdy(sub_raw, ax_i, row=1)
+
+    fig.supxlabel("Number of Topics", x=0.45)
+    fig.supylabel("Runtime (s)", x=-0.004)
+
+    legend_handles = [
+        Patch(facecolor=encoder2colors[encoder], label=encoder)
+        for encoder in CATEGORY_ORDERS["Encoder"]
+    ]
+    plt.legend(
+        handles=legend_handles,
+        loc="center left",
+        bbox_to_anchor=(1.05, 0.5),
+        frameon=False,
+    )
+
+    plt.tight_layout()
+
+    return fig

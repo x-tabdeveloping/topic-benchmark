@@ -12,7 +12,7 @@ from topic_benchmark.defaults import default_vectorizer
 from topic_benchmark.figures_plt import (
     plot_nonalphabetical,
     plot_speed,
-    plot_speed_aggregated,
+    plot_speed_v2,
     plot_stop_words,
     preprocess_for_plotting,
 )
@@ -129,7 +129,7 @@ def make_figures(
     figures = {
         "n_nonalphabetical": plot_nonalphabetical,
         "speed": plot_speed,
-        "speed_agg": plot_speed_aggregated,
+        "speed_v2": plot_speed_v2,
         "stop_words": plot_stop_words,
     }
     for figure_name, produce in figures.items():
