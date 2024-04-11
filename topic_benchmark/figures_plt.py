@@ -289,12 +289,12 @@ def plot_speed(data):
             fig.axes[1,i].set_ylabel('')
             fig.axes[1,i].set_title('')
             fig.axes[1,i].set_xticklabels(fig.axes[1,i].get_xticklabels(), rotation=60, ha='right')
-        for ax in fig.axes.flat:
-            ax.grid(True, axis='both')
 
         return fig
 
     fig = fill_facet(pd.concat([data_raw, data_pro]))
+    for ax in fig.axes.flat:
+        ax.grid(True, axis='both')
     fig.figure.supylabel("Runtime (s)", x=-0.004)
 
     plt.tight_layout()

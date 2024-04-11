@@ -128,9 +128,9 @@ def make_figures(
     data = preprocess_for_plotting(data)
     figures = {
         "n_nonalphabetical": plot_nonalphabetical,
-        "speed": plot_speed,
-        "speed_v2": plot_speed_v2,
         "stop_words": plot_stop_words,
+        "speed_v2": plot_speed_v2,
+        "speed": plot_speed,
     }
     for figure_name, produce in figures.items():
         fig = produce(data)
