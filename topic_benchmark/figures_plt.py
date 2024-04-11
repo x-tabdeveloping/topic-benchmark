@@ -333,7 +333,7 @@ def plot_speed_v2(data):
                 c=group_c,
             )
         axs[row][ax_i].set_title(MODEL_ORDER[ax_i])
-        axs[row][ax_i].set_ylim(-1, 6000)
+        axs[row][ax_i].set_ylim(-900, 6000)
         axs[row][ax_i].set_xticks(np.arange(10, 60, step=10))
         axs[row][ax_i].set_yticks(np.arange(0, 7000, step=1000))
         axs[row][ax_i].xaxis.set_tick_params(labelsize=28)
