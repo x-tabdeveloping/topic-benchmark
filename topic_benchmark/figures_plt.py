@@ -269,13 +269,14 @@ def plot_speed(data):
     # x: n topics, y: processing speed, color: encoder
     def fill_facet(df):
 
-        sns.set_style('whitegrid', {"grid.linestyle": ":"})
+        sns.set_style('whitegrid', {"grid.linestyle": ":",})
         fig = sns.catplot(data=df, x='Model', y='Runtime in Seconds', col='Encoder',
                           kind='box', height=5., aspect=1.1, row='Dataset',
                           whis=(0, 100),
-                          width=0.5, linewidth=1.2,
+                          width=0.5, linewidth=1.4,
                           order=MODEL_ORDER,
                           margin_titles=True,
+                          facet_kws={"despine": False},
                           col_order= ['GloVe',
                                      'all-MiniLM-L6-v2',
                                      'all-mpnet-base-v2', 
@@ -289,12 +290,17 @@ def plot_speed(data):
             fig.axes[1,i].set_ylabel('')
             fig.axes[1,i].set_title('')
             fig.axes[1,i].set_xticklabels(fig.axes[1,i].get_xticklabels(), rotation=60, ha='right')
-
         return fig
 
     fig = fill_facet(pd.concat([data_raw, data_pro]))
     for ax in fig.axes.flat:
         ax.grid(True, axis='both')
+        for _,s in ax.spines.items():
+            s.set_linewidth(2)
+        try:
+            ax.get_xticklabels()[2].set_weight("bold")
+        except:
+            pass
     fig.figure.supylabel("Runtime (s)", x=-0.004)
 
     plt.tight_layout()
