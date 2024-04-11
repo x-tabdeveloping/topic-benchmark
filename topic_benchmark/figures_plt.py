@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
 from matplotlib.patches import Patch
 from sklearn.feature_extraction._stop_words import ENGLISH_STOP_WORDS
 
@@ -49,8 +50,6 @@ def set_plt_params(SCALE):
     plt.rcParams.update(
         {
             "text.usetex": False,
-            "font.family": "Times New Roman",
-            "font.serif": "serif",
             "mathtext.fontset": "cm",
             "axes.unicode_minus": False,
             "axes.labelsize": 9 * SCALE,
@@ -122,11 +121,11 @@ def plot_stop_words(data):
     df2 = data[data["Encoder"] == CATEGORY_ORDERS["Encoder"][2]]
     df3 = data[data["Encoder"] == CATEGORY_ORDERS["Encoder"][3]]
 
-    fig, axs = plt.subplots(ncols=4, figsize=(20, 5))
+    fig, axs = plt.subplots(ncols=4, figsize=(23, 7))
 
     # fill in the facets
     def fill_facet(df, ax_i):
-        axs[ax_i].grid(visible=True, which="major", axis="y", linewidth=0.5)
+        axs[ax_i].grid(visible=True, which="major", axis="y", linewidth=0.5, linestyle=':')
 
         for i, group in df.groupby("Model"):
             group_c = models2colors[group["Model"].tolist()[0]]
@@ -192,11 +191,11 @@ def plot_nonalphabetical(data):
     df2 = data[data["Encoder"] == CATEGORY_ORDERS["Encoder"][2]]
     df3 = data[data["Encoder"] == CATEGORY_ORDERS["Encoder"][3]]
 
-    fig, axs = plt.subplots(ncols=4, figsize=(20, 5))
+    fig, axs = plt.subplots(ncols=4, figsize=(23, 7))
 
     # fill in the facets
     def fill_facet(df, ax_i):
-        axs[ax_i].grid(visible=True, which="major", axis="y", linewidth=0.5)
+        axs[ax_i].grid(visible=True, which="major", axis="y", linewidth=0.5, linestyle=':')
 
         for i, group in df.groupby("Model"):
             group_c = models2colors[group["Model"].tolist()[0]]
@@ -234,7 +233,7 @@ def plot_nonalphabetical(data):
     fill_facet(df3, 3)
 
     fig.supxlabel("Number of Topics", x=0.45)
-    fig.supylabel("RF of Non-alphabetical Terms", x=-0.004)
+    fig.supylabel("RF of Non-Alphabetical Terms", x=-0.004)
 
     legend_handles = [
         Patch(facecolor=models2colors[model], label=model)
@@ -251,88 +250,63 @@ def plot_nonalphabetical(data):
     return fig
 
 
-def plot_speed_aggregated(data):
-    return plt.figure()
-
 
 def plot_speed(data):
 
-    set_plt_params(SCALE=3.5)
+    set_plt_params(SCALE=3)
 
     # drop some models
-    forbidden_models = ["KeyNMF", "GMM", "NMF"]
+    forbidden_models = ["KeyNMF", "GMM"]
     data = data.query("Model != @forbidden_models")
-    MODEL_ORDER = CATEGORY_ORDERS["Model"]
-    MODEL_ORDER = [m for m in MODEL_ORDER if m not in forbidden_models]
+    MODEL_ORDER = ['NMF', 'LDA', 'S³', 'BERTopic', 'Top2Vec', 'CombinedTM', 'ZeroShotTM']
 
     data_raw = data[data["Dataset"] == "20 Newsgroups Raw"]
     data_pro = data[data["Dataset"] == "20 Newsgroups Preprocessed"]
-
-
-    fig, axs = plt.subplots(ncols=len(MODEL_ORDER), figsize=(25, 5))
+    data_raw = data_raw.replace({'20 Newsgroups Raw': 'Raw'})
+    data_pro = data_pro.replace({'20 Newsgroups Preprocessed': 'Preprocessed'})
 
     # facet: model
     # x: n topics, y: processing speed, color: encoder
-    def fill_facet(df, ax_i, line_style="-"):
+    def fill_facet(df):
 
-        axs[ax_i].grid(visible=True, which="major", axis="y", linewidth=0.5)
+        sns.set_style('whitegrid', {"grid.linestyle": ":"})
+        fig = sns.catplot(data=df, x='Model', y='Runtime in Seconds', col='Encoder',
+                          kind='box', height=5., aspect=1.1, row='Dataset',
+                          whis=(0, 100),
+                          width=0.5, linewidth=1.2,
+                          order=MODEL_ORDER,
+                          margin_titles=True,
+                          col_order= ['GloVe',
+                                     'all-MiniLM-L6-v2',
+                                     'all-mpnet-base-v2', 
+                                     'intfloat/e5-large-v2'],
+                                     sharey = 'row',
+                          palette=models2colors)
+        fig.set_titles(col_template='{col_name}', row_template='{row_name}')
+        for i in range(4):
+            fig.axes[1,i].set_xlabel('')
+            fig.axes[0,i].set_ylabel('')
+            fig.axes[1,i].set_ylabel('')
+            fig.axes[1,i].set_title('')
+            fig.axes[1,i].set_xticklabels(fig.axes[1,i].get_xticklabels(), rotation=60, ha='right')
+        for ax in fig.axes.flat:
+            ax.grid(True, axis='both')
 
-        for i, group in df.groupby("Encoder"):
-            group_c = encoder2colors[group["Encoder"].tolist()[0]]
-            axs[ax_i].plot(
-                "Number of Topics",
-                "Runtime in Seconds",
-                line_style,
-                linewidth=2,
-                data=group,
-                c=group_c,
-            )
-        axs[ax_i].set_title(MODEL_ORDER[ax_i])
-        axs[ax_i].set_ylim(-1, 15_000)
-        axs[ax_i].set_xticks(np.arange(10, 60, step=10))
-        axs[ax_i].set_yticks(np.arange(0, 17_500, step=2500))
-        axs[ax_i].xaxis.set_tick_params(labelsize=28)
-        axs[ax_i].yaxis.set_tick_params(labelsize=20)
+        return fig
 
-        if ax_i > 0:
-            axs[ax_i].yaxis.set_ticklabels([])
-            for tick in axs[ax_i].yaxis.get_major_ticks():
-                tick.tick1line.set_visible(False)
-                tick.tick2line.set_visible(False)
-                tick.label1.set_visible(False)
-                tick.label2.set_visible(False)
-
-    for ax_i, model_tag in enumerate(MODEL_ORDER):
-        sub_raw = data_raw[data_raw["Model"] == model_tag]
-        sub_pro = data_pro[data_pro["Model"] == model_tag]
-        fill_facet(sub_raw, ax_i, line_style="--")
-        fill_facet(sub_pro, ax_i, line_style="-")
-
-    fig.supxlabel("Number of Topics", x=0.45)
-    fig.supylabel("Runtime (s)", x=-0.004)
-
-    legend_handles = [
-        Patch(facecolor=encoder2colors[encoder], label=encoder)
-        for encoder in CATEGORY_ORDERS["Encoder"]
-    ]
-    plt.legend(
-        handles=legend_handles,
-        loc="center left",
-        bbox_to_anchor=(1.05, 0.5),
-        frameon=False,
-    )
+    fig = fill_facet(pd.concat([data_raw, data_pro]))
+    fig.figure.supylabel("Runtime (s)", x=-0.004)
 
     plt.tight_layout()
-
     return fig
 
 
 def plot_speed_v2(data):
 
-    set_plt_params(SCALE=3.5)
+    set_plt_params(SCALE=3.2)
 
     # drop some models
-    forbidden_models = ["KeyNMF", "GMM", "NMF"]
+    forbidden_models = ["KeyNMF", "GMM"]
     data = data.query("Model != @forbidden_models")
     MODEL_ORDER = CATEGORY_ORDERS["Model"]
     MODEL_ORDER = [m for m in MODEL_ORDER if m not in forbidden_models]
@@ -340,110 +314,7 @@ def plot_speed_v2(data):
     data_raw = data[data["Dataset"] == "20 Newsgroups Raw"]
     data_pro = data[data["Dataset"] == "20 Newsgroups Preprocessed"]
 
-    fig, axs = plt.subplots(nrows=2, ncols=4, figsize=(25, 10))
-
-    # facet: encoder
-    # x: n topics, y: processing speed, color: model
-    def fill_facet_upper_row(df, ax_i, row, line_style="-"):
-
-        axs[row][ax_i].grid(visible=True, which="major", axis="y", linewidth=0.5)
-
-        for i, group in df.groupby("Model"):
-            group_c = models2colors[group["Model"].tolist()[0]]
-            axs[row][ax_i].plot(
-                "Number of Topics",
-                "Runtime in Seconds",
-                line_style,
-                linewidth=4,
-                data=group,
-                c=group_c,
-            )
-        axs[row][ax_i].set_title(CATEGORY_ORDERS["Encoder"][ax_i])
-        axs[row][ax_i].set_ylim(-1, 6000)
-        axs[row][ax_i].set_xticks(np.arange(10, 60, step=10))
-        axs[row][ax_i].set_yticks(np.arange(0, 7000, step=1000))
-        axs[row][ax_i].xaxis.set_tick_params(labelsize=28)
-        axs[row][ax_i].yaxis.set_tick_params(labelsize=20)
-
-        if ax_i > 0:
-            axs[row][ax_i].yaxis.set_ticklabels([])
-            for tick in axs[row][ax_i].yaxis.get_major_ticks():
-                tick.tick1line.set_visible(False)
-                tick.tick2line.set_visible(False)
-                tick.label1.set_visible(False)
-                tick.label2.set_visible(False)
-
-    def fill_facet_lower_row(df, ax_i, row, line_style="-"):
-
-        axs[row][ax_i].grid(visible=True, which="major", axis="y", linewidth=0.5)
-
-        for i, group in df.groupby("Model"):
-            group_c = models2colors[group["Model"].tolist()[0]]
-            axs[row][ax_i].plot(
-                "Number of Topics",
-                "Runtime in Seconds",
-                line_style,
-                linewidth=4,
-                data=group,
-                c=group_c,
-            )
-        axs[row][ax_i].set_ylim(-1, 15_000)
-        axs[row][ax_i].set_xticks(np.arange(10, 60, step=10))
-        axs[row][ax_i].set_yticks(np.arange(0, 17_500, step=2500))
-        axs[row][ax_i].xaxis.set_tick_params(labelsize=28)
-        axs[row][ax_i].yaxis.set_tick_params(labelsize=20)
-
-        if ax_i > 0:
-            axs[row][ax_i].yaxis.set_ticklabels([])
-            for tick in axs[row][ax_i].yaxis.get_major_ticks():
-                tick.tick1line.set_visible(False)
-                tick.tick2line.set_visible(False)
-                tick.label1.set_visible(False)
-                tick.label2.set_visible(False)
-
-    # upper row
-    for ax_i, encoder_tag in enumerate(CATEGORY_ORDERS["Encoder"]):
-        sub_pro = data_pro[data_pro["Encoder"] == encoder_tag]
-        fill_facet_upper_row(sub_pro, ax_i, row=0)
-
-    # lower row
-    for ax_i, encoder_tag in enumerate(CATEGORY_ORDERS["Encoder"]):
-        sub_raw = data_raw[data_raw["Encoder"] == encoder_tag]
-        fill_facet_lower_row(sub_raw, ax_i, row=1)
-
-    fig.supxlabel("Number of Topics", x=0.45)
-    fig.supylabel("Runtime (s)", x=-0.004)
-
-    legend_handles = [
-        Patch(facecolor=models2colors[model], label=model)
-        for model in CATEGORY_ORDERS["Model"]
-    ]
-    plt.legend(
-        handles=legend_handles,
-        loc="center left",
-        bbox_to_anchor=(1.05, 0.5),
-        frameon=False,
-    )
-
-    plt.tight_layout()
-
-    return fig
-
-
-def plot_speed_v3(data):
-
-    set_plt_params(SCALE=3.5)
-
-    # drop some models
-    forbidden_models = ["KeyNMF", "GMM", "NMF"]
-    data = data.query("Model != @forbidden_models")
-    MODEL_ORDER = CATEGORY_ORDERS["Model"]
-    MODEL_ORDER = [m for m in MODEL_ORDER if m not in forbidden_models]
-
-    data_raw = data[data["Dataset"] == "20 Newsgroups Raw"]
-    data_pro = data[data["Dataset"] == "20 Newsgroups Preprocessed"]
-
-    fig, axs = plt.subplots(nrows=2, ncols=6, figsize=(25, 10))
+    fig, axs = plt.subplots(nrows=2, ncols=7, figsize=(28, 10))
 
     # facet: encoder
     # x: n topics, y: processing speed, color: model
@@ -490,7 +361,7 @@ def plot_speed_v3(data):
                 data=group,
                 c=group_c,
             )
-        axs[row][ax_i].set_ylim(-1, 15_000)
+        axs[row][ax_i].set_ylim(-900, 15_000)
         axs[row][ax_i].set_xticks(np.arange(10, 60, step=10))
         axs[row][ax_i].set_yticks(np.arange(0, 17_500, step=2500))
         axs[row][ax_i].xaxis.set_tick_params(labelsize=28)
@@ -514,18 +385,23 @@ def plot_speed_v3(data):
         sub_raw = data_raw[data_raw["Model"] == model_tag]
         fill_facet_lower_row(sub_raw, ax_i, row=1)
 
-    fig.supxlabel("Number of Topics", x=0.45)
-    fig.supylabel("Runtime (s)", x=-0.004)
+    axs[0,0].set_ylabel('Preprocessed')
+    axs[1,0].set_ylabel('Raw')
+    fig.supxlabel("Number of Topics", x=0.52)
+    fig.supylabel("Runtime (s)", x=0.05)
 
+    
     legend_handles = [
         Patch(facecolor=encoder2colors[encoder], label=encoder)
         for encoder in CATEGORY_ORDERS["Encoder"]
     ]
     plt.legend(
         handles=legend_handles,
-        loc="center left",
-        bbox_to_anchor=(1.05, 0.5),
+        loc="upper right",
         frameon=False,
+        bbox_to_anchor=(0.32, 2.6),
+        borderaxespad=0.,
+        ncol=4
     )
 
     plt.tight_layout()

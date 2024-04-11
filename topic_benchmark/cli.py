@@ -13,7 +13,6 @@ from topic_benchmark.figures_plt import (
     plot_nonalphabetical,
     plot_speed,
     plot_speed_v2,
-    plot_speed_v3,
     plot_stop_words,
     preprocess_for_plotting,
 )
@@ -131,7 +130,6 @@ def make_figures(
         "n_nonalphabetical": plot_nonalphabetical,
         "speed": plot_speed,
         "speed_v2": plot_speed_v2,
-        "speed_v3": plot_speed_v3,
         "stop_words": plot_stop_words,
     }
     for figure_name, produce in figures.items():
