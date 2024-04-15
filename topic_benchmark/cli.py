@@ -9,9 +9,10 @@ from sentence_transformers import SentenceTransformer
 
 from topic_benchmark.benchmark import BenchmarkEntry, run_benchmark
 from topic_benchmark.defaults import default_vectorizer
-from topic_benchmark.figures import (
+from topic_benchmark.figures_plt import (
     plot_nonalphabetical,
     plot_speed,
+    plot_speed_v2,
     plot_stop_words,
     preprocess_for_plotting,
 )
@@ -108,16 +109,10 @@ def make_table(
     out_dir=Arg(
         "--out_dir", "-o", help="Directory where the figures should be placed."
     ),
-    show_figures=Arg(
-        "--show_figures",
-        "-s",
-        help="Indicates whether the figures should be displayed in a browser tab or not.",
-    ),
 )
 def make_figures(
     results_folder: str = "results/",
     out_dir: str = "figures",
-    show_figures: bool = False,
 ):
     results_folder = Path(results_folder)
     files = results_folder.glob("*.jsonl")
@@ -133,12 +128,11 @@ def make_figures(
     data = preprocess_for_plotting(data)
     figures = {
         "n_nonalphabetical": plot_nonalphabetical,
-        "speed": plot_speed,
         "stop_words": plot_stop_words,
+        "speed_v2": plot_speed_v2,
+        "speed": plot_speed,
     }
     for figure_name, produce in figures.items():
         fig = produce(data)
         out_path = out_dir.joinpath(f"{figure_name}.png")
-        fig.write_image(out_path, scale=3)
-        if show_figures:
-            fig.show()
+        fig.savefig(out_path, dpi=300, bbox_inches="tight")
