@@ -6,7 +6,7 @@ line-length=79
 
 [tool.poetry]
 name = "topic-benchmark"
-version = "0.2.5"
+version = "0.2.6"
 description = "Benchmarking topic models for a paper"
 authors = ["Márton Kardos <power.up1163@gmail.com>"]
 license = "MIT"
