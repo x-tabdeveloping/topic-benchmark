@@ -55,9 +55,11 @@ class TopicPipeline(Pipeline, TopicModel):
             corpus=corpus,
             document_term_matrix=document_term_matrix,
             document_topic_matrix=document_topic_matrix,
-            document_representation=document_term_matrix
-            if document_representation == "term"
-            else document_topic_matrix,
+            document_representation=(
+                document_term_matrix
+                if document_representation == "term"
+                else document_topic_matrix
+            ),
             vocab=vocab,
             topic_term_matrix=components,
             transform=self.transform,
@@ -82,7 +84,7 @@ def make_topic_pipeline(
 @model_registry.register("NMF")
 def load_nmf(encoder, vectorizer: CountVectorizer) -> Loader:
     def _load(n_components: int):
-        model = NMF(n_components)
+        model = NMF(n_components, random_state=42)
         return make_topic_pipeline(vectorizer, model)
 
     return _load
@@ -91,7 +93,7 @@ def load_nmf(encoder, vectorizer: CountVectorizer) -> Loader:
 @model_registry.register("LDA")
 def load_lda(encoder, vectorizer: CountVectorizer) -> Loader:
     def _load(n_components: int):
-        model = LatentDirichletAllocation(n_components)
+        model = LatentDirichletAllocation(n_components, random_state=42)
         return make_topic_pipeline(vectorizer, model)
 
     return _load

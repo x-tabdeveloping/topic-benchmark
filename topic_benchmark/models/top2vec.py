@@ -11,7 +11,9 @@ from topic_benchmark.registries import model_registry
 
 @model_registry.register("Top2Vec")
 def load_top2vec(encoder, vectorizer: CountVectorizer) -> Loader:
-    dim_red = UMAP(n_neighbors=15, n_components=5, metric="cosine")
+    dim_red = UMAP(
+        n_neighbors=15, n_components=5, metric="cosine", random_state=42
+    )
     clustering = HDBSCAN(
         min_cluster_size=15,
         metric="euclidean",
@@ -27,6 +29,7 @@ def load_top2vec(encoder, vectorizer: CountVectorizer) -> Loader:
             feature_importance="centroid",
             reduction_method="smallest",
             n_reduce_to=n_components,
+            random_state=42,
         )
 
     return _load
