@@ -7,11 +7,12 @@ from topic_benchmark.benchmark import BenchmarkEntry, BenchmarkError
 
 METRICS_TO_DISPLAY_NAME = {
     "NPMI Coherence": "NPMI",
-    "Word Embedding Coherence": "WEC",
+    "Word Embedding Coherence": "ex-WEC",
     "Diversity": "Diversity",
+    "IWEC": "in-WEC",
 }
 
-METRICS = ["NPMI", "WEC", "Diversity"]
+METRICS = ["NPMI", "Diversity", "in-WEC", "ex-WEC"]
 
 
 def produce_header(datasets: list[str]) -> list[str]:
