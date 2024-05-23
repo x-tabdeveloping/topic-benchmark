@@ -2,6 +2,8 @@ import itertools
 
 import gensim.downloader as api
 import numpy as np
+from gensim.models import Word2Vec
+from sklearn.feature_extraction.text import CountVectorizer
 from turftopic.data import TopicData
 
 from topic_benchmark.base import Metric
@@ -29,5 +31,22 @@ def load_wec() -> Metric:
     def score(data: TopicData):
         topics = get_top_k(data, top_k)
         return word_embedding_coherence(topics, wv)
+
+    return score
+
+
+@metric_registry.register("IWEC")
+def load_iwec() -> Metric:
+    """Internal word embedding coherence:
+    Trains word2vec model on the corpus, then uses it to evaluate
+    based on WEC."""
+    top_k = 10
+
+    def score(data: TopicData):
+        tokenizer = CountVectorizer(vocabulary=data["vocab"]).build_analyzer()
+        texts = [tokenizer(text) for text in data["corpus"]]
+        model = Word2Vec(texts, min_count=1)
+        topics = get_top_k(data, top_k)
+        return word_embedding_coherence(topics, model.wv)
 
     return score
