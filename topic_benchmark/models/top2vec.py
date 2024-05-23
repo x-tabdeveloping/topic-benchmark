@@ -29,7 +29,6 @@ def load_top2vec(encoder, vectorizer: CountVectorizer) -> Loader:
             feature_importance="centroid",
             reduction_method="smallest",
             n_reduce_to=n_components,
-            random_state=42,
         )
 
     return _load

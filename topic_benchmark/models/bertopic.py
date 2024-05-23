@@ -27,7 +27,6 @@ def load_bertopic(encoder, vectorizer: CountVectorizer) -> Loader:
             feature_importance="c-tf-idf",
             reduction_method="agglomerative",
             n_reduce_to=n_components,
-            random_state=42,
         )
 
     return _load
