@@ -453,4 +453,5 @@ def plot_disaggregated(data, metric):
                    loc=7, 
                    bbox_to_anchor=(1.01, 0.52), 
                    frameon=False)
+    plt.xticks(np.arange(10,60,10))
     return fig
