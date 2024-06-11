@@ -8,8 +8,10 @@ from sklearn.feature_extraction._stop_words import ENGLISH_STOP_WORDS
 
 CATEGORY_ORDERS = {
     "Dataset": [
-        "20 Newsgroups Preprocessed",
+        "ArXiv ML Papers",
+        "BBC News",
         "20 Newsgroups Raw",
+        "20 Newsgroups Preprocessed",
     ],
     "Model": [
         "S³",
@@ -412,4 +414,43 @@ def plot_speed_v2(data):
 
     plt.tight_layout()
 
+    return fig
+
+
+
+def plot_disaggregated(data, metric):
+
+    set_plt_params(SCALE=2)
+    # sns.set_style('whitegrid', {"grid.linestyle": ":",})
+    data = data[data["Dataset"] != "20 Newsgroups Preprocessed"]
+    forbidden_models = ["KeyNMF", "GMM"]
+    data = data.query("Model != @forbidden_models")
+    data[metric] =  data['results'].apply(lambda x: x[metric])
+
+    data['is_target'] = np.where(data['Model']=='S³', 4, 2)
+
+    fig = sns.relplot(
+        data=data,
+        x='Number of Topics',
+        y=metric,
+        row='Dataset',
+        hue='Model',
+        col='Encoder',
+        size='is_target',
+        kind='line', 
+        palette=models2colors, 
+        hue_order=CATEGORY_ORDERS['Model'],
+        aspect=1, height=3,
+        col_order=CATEGORY_ORDERS['Encoder'],
+        row_order=CATEGORY_ORDERS["Dataset"][:-1]
+        )
+    fig.set_titles("{col_name}")
+    for i in range(len(CATEGORY_ORDERS["Dataset"][:-1])):
+        fig.axes[i,0].set_ylabel(CATEGORY_ORDERS["Dataset"][:-1][i])
+    fig.legend.remove()
+
+    fig.fig.legend(handles=fig.legend.legendHandles[:8], 
+                   loc=7, 
+                   bbox_to_anchor=(1.01, 0.52), 
+                   frameon=False)
     return fig

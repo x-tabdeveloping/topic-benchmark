@@ -14,6 +14,7 @@ from topic_benchmark.figures_plt import (
     plot_speed,
     plot_speed_v2,
     plot_stop_words,
+    plot_disaggregated,
     preprocess_for_plotting,
 )
 from topic_benchmark.registries import encoder_registry
@@ -131,8 +132,16 @@ def make_figures(
         "stop_words": plot_stop_words,
         "speed_v2": plot_speed_v2,
         "speed": plot_speed,
+        "disaggregated": plot_disaggregated,
     }
     for figure_name, produce in figures.items():
-        fig = produce(data)
-        out_path = out_dir.joinpath(f"{figure_name}.png")
-        fig.savefig(out_path, dpi=300, bbox_inches="tight")
+        if figure_name != 'disaggregated':
+            fig = produce(data)
+            out_path = out_dir.joinpath(f"{figure_name}.png")
+            fig.savefig(out_path, dpi=300, bbox_inches="tight")
+        else:
+            for metric in ["Diversity", "Word Embedding Coherence", "IWEC"]:
+                fig = produce(data, metric)
+                out_path = out_dir.joinpath(f"{figure_name}_{metric.replace(' ','_')}.png")
+                fig.savefig(out_path, dpi=300, bbox_inches="tight")
+
