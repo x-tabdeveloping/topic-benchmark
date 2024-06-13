@@ -48,6 +48,13 @@ encoder2colors = {
 }
 
 
+metric_labels = {
+        "Diversity": "Diversity",
+        "IWEC": "WEC$_{in}$",
+        "Word Embedding Coherence": "WEC$_{ex}$",
+}
+
+
 def set_plt_params(SCALE):
     plt.rcParams.update(
         {
@@ -437,7 +444,7 @@ def plot_disaggregated(data, metric):
         hue='Model',
         col='Encoder',
         size='is_target',
-        kind='line', 
+        kind='line',
         palette=models2colors, 
         hue_order=CATEGORY_ORDERS['Model'],
         aspect=1, height=3,
@@ -455,6 +462,7 @@ def plot_disaggregated(data, metric):
                    frameon=False)
     
     fig.fig.supxlabel("Number of Topics", x=.45)
+    fig.fig.supylabel(metric_labels[metric], x=-0.01, y=0.518)
     for i in range(4):
         fig.axes[-1,i].set_xlabel('')
 
