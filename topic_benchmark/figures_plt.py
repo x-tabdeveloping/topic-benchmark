@@ -449,9 +449,14 @@ def plot_disaggregated(data, metric):
         fig.axes[i,0].set_ylabel(CATEGORY_ORDERS["Dataset"][:-1][i])
     fig.legend.remove()
 
-    fig.fig.legend(handles=fig.legend.legendHandles[:8], 
-                   loc=7, 
-                   bbox_to_anchor=(1.01, 0.52), 
+    fig.fig.legend(handles=fig.legend.legendHandles[:8],
+                   loc=7,
+                   bbox_to_anchor=(1.01, 0.52),
                    frameon=False)
+    
+    fig.fig.supxlabel("Number of Topics", x=.45)
+    for i in range(4):
+        fig.axes[-1,i].set_xlabel('')
+
     plt.xticks(np.arange(10,60,10))
     return fig
