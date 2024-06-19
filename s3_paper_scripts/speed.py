@@ -52,22 +52,30 @@ summary = data.groupby("model")["percent_slower"].agg(["mean", hdi_97, hdi_2])
 summary["positive"] = summary["hdi_97"] - summary["mean"]
 summary["negative"] = summary["mean"] - summary["hdi_2"]
 
-
-print("\\textbf{Model} & \\textbf{\% Slower Than S\\textsuperscript{3}} \\\\")
-print("\\midrule")
-for model, row in (
-    (summary * 100)
-    .sort_values("mean")
-    .drop(columns=["positive", "negative"])
-    .iterrows()
-):
-    lower = np.format_float_positional(
-        row["hdi_2"], precision=3, unique=False, fractional=False, trim="k"
-    ).removesuffix(".")
-    upper = np.format_float_positional(
-        row["hdi_97"], precision=3, unique=False, fractional=False, trim="k"
-    ).removesuffix(".")
-    val = np.format_float_positional(
-        row["mean"], precision=3, unique=False, fractional=False, trim="k"
-    ).removesuffix(".")
-    print(f"{model} & {val}\% [{lower}, {upper}] \\\\")
+out_path = Path("tables/speed.tex")
+out_path.parent.mkdir(exist_ok=True)
+with out_path.open("w") as out_file:
+    out_file.write(
+        "\\textbf{Model} & \\textbf{Runtime Difference From S\\textsuperscript{3}} \\\\ \n"
+    )
+    out_file.write("\\midrule \n")
+    for model, row in (
+        (summary * 100)
+        .sort_values("mean")
+        .drop(columns=["positive", "negative"])
+        .iterrows()
+    ):
+        lower = np.format_float_positional(
+            row["hdi_2"], precision=3, unique=False, fractional=False, trim="k"
+        ).removesuffix(".")
+        upper = np.format_float_positional(
+            row["hdi_97"],
+            precision=3,
+            unique=False,
+            fractional=False,
+            trim="k",
+        ).removesuffix(".")
+        val = np.format_float_positional(
+            row["mean"], precision=3, unique=False, fractional=False, trim="k"
+        ).removesuffix(".")
+        out_file.write(f"{model} & {val}\% [{lower}, {upper}] \\\\ \n")
