@@ -23,12 +23,6 @@ METRICS = [
 def produce_header(datasets: list[str]) -> list[str]:
     n_datasets = len(datasets)
     column_align = "l" + ("c" * (n_datasets * len(METRICS)))
-    midrules = []
-    for i in range(n_datasets):
-        start = (i + 1) * len(METRICS) - 2
-        end = start + len(METRICS) - 1
-        midrule = f"\\cmidrule(l{{3pt}}r{{3pt}}){{{start}-{end}}}"
-        midrules.append(midrule)
     metric_names = " & " + " & ".join(METRICS * n_datasets)
     lines = [
         "\\begin{table*}[p]",
@@ -43,7 +37,6 @@ def produce_header(datasets: list[str]) -> list[str]:
             for dataset in datasets
         )
         + "\\\\",
-        " ".join(midrules),
         metric_names + "\\\\",
         "\\midrule",
     ]
