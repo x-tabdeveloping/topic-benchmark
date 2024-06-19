@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 import plotly.express as px
@@ -9,7 +11,7 @@ from turftopic import SemanticSignalSeparation
 
 from topic_benchmark.datasets.arxiv_ml import load_arxiv_ml
 
-corpus = load_arxiv_ml
+corpus = load_arxiv_ml()
 
 trf = SentenceTransformer("all-MiniLM-L6-v2")
 embeddings = trf.encode(corpus, show_progress_bar=True)
@@ -19,9 +21,11 @@ model = SemanticSignalSeparation(
 )
 topic_data = model.prepare_topic_data(corpus, embeddings=embeddings)
 
-model.print_topics(top_k=5)
+table_path = Path("tables/arxiv_ml_topics.tex")
+table_path.parent.mkdir(exist_ok=True)
 
-print(model.export_topics(top_k=5, format="latex"))
+with table_path.open("w") as table_file:
+    table_file.write(model.export_topics(top_k=5, format="latex"))
 
 topic_content = pd.DataFrame(
     topic_data["topic_term_matrix"].T, columns=model.topic_names
@@ -32,6 +36,7 @@ topic_content["freq"] = np.squeeze(
 )
 topic_content = topic_content[~topic_content["word"].isin(ENGLISH_STOP_WORDS)]
 
+Path("figures").mkdir(exist_ok=True)
 topic1 = 1
 topic2 = 4
 x = topic_content[model.topic_names[topic1]]
