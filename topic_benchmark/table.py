@@ -6,13 +6,18 @@ import pandas as pd
 from topic_benchmark.benchmark import BenchmarkEntry, BenchmarkError
 
 METRICS_TO_DISPLAY_NAME = {
-    "NPMI Coherence": "NPMI",
-    "Word Embedding Coherence": "ex-WEC",
+    "NPMI Coherence": "C\\textsubscript{NPMI}",
+    "Word Embedding Coherence": "WEC\\textsubscript{ex}",
     "Diversity": "Diversity",
-    "IWEC": "in-WEC",
+    "IWEC": "WEC\\textsubscript{in}",
 }
 
-METRICS = ["NPMI", "Diversity", "in-WEC", "ex-WEC"]
+METRICS = [
+    "C\\textsubscript{NPMI}",
+    "WEC\\textsubscript{ex}",
+    "Diversity",
+    "WEC\\textsubscript{in}",
+]
 
 
 def produce_header(datasets: list[str]) -> list[str]:
@@ -131,6 +136,8 @@ EMBEDDING_ORDER = [
 DATASET_ORDER = [
     "20 Newsgroups Preprocessed",
     "20 Newsgroups Raw",
+    "BBC News",
+    "ArXiv ML Papers",
 ]
 
 
