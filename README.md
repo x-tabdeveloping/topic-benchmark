@@ -48,7 +48,7 @@ python3 -m topic_benchmark table -o results.tex
 Result files to all runs in the $S^3$ publication can be found in the `results/` folder in the repository.
 To reproduce the results reported in our paper, please do the following.
 
-First, install this package by running the following CLI command:
+First, install this package by running the following command:
 
 ```bash
 pip install topic-benchmark
