@@ -45,7 +45,8 @@ python3 -m topic_benchmark table -o results.tex
 | --out_file (-o) | The output path of the benchmark results. By default, results will be printed to stdout. | `str` | `None` | 
 
 ## Reproducing $S^3$ paper results
-To reproduce results reported in our paper, please do the following.
+Result files to all runs in the $S^3$ publication can be found in the `results/` folder in the repository.
+To reproduce the results reported in our paper, please do the following.
 
 First, install this package by running the following CLI command:
 
@@ -68,7 +69,7 @@ To produce figures and tables in the paper, you can use the scripts in the  `s3_
 pip install -r s3_paper_scripts/requirements.txt
 
 # Table 3: Main Table (tables/main_table.tex)
-python3 s3_paper_scripts/effect_of_preprocessing.py
+python3 s3_paper_scripts/main_table.py
 
 # Figure 2: Preprocessing effects (figures/effect_of_preprocessing.png)
 python3 s3_paper_scripts/effect_of_preprocessing.py
