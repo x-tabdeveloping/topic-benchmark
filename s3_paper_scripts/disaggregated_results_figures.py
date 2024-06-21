@@ -69,12 +69,14 @@ def set_plt_params(SCALE):
 
 
 def plot_disaggregated(data: pd.DataFrame, metric: str):
+    data["Model"] = data["model"]
+    data["Dataset"] = data["dataset"]
+    data["Encoder"] = data["encoder"]
+    data["Number of Topics"] = data["n_topics"]
     set_plt_params(SCALE=2)
     # sns.set_style('whitegrid', {"grid.linestyle": ":",})
     data = data[data["Dataset"] != "20 Newsgroups Preprocessed"]
-    forbidden_models = ["KeyNMF", "GMM"]
-    data = data.query("Model != @forbidden_models")
-    data[metric] = data["results"].apply(lambda x: x[metric])
+    data = data[~data["Model"].isin(["KeyNMF", "GMM"])]
 
     data["is_target"] = np.where(data["Model"] == "S³", 4, 2)
 
