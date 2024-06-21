@@ -111,7 +111,7 @@ def format_cells(table: pd.DataFrame) -> pd.DataFrame:
 
 MODEL_ORDER = [
     "S³",
-    "KeyNMF",
+    # "KeyNMF",
     "GMM",
     "Top2Vec",
     "BERTopic",
@@ -129,7 +129,7 @@ EMBEDDING_ORDER = [
 ]
 
 DATASET_ORDER = [
-    "20 Newsgroup Raw",
+    "20 Newsgroups Raw",
     "BBC News",
     "ArXiv ML Papers",
 ]
