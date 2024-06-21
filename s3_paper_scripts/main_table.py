@@ -1,3 +1,5 @@
+import json
+from pathlib import Path
 from typing import Union
 
 import numpy as np
@@ -13,10 +15,10 @@ METRICS_TO_DISPLAY_NAME = {
 }
 
 METRICS = [
-    "C\\textsubscript{NPMI}",
-    "WEC\\textsubscript{ex}",
+    # "C\\textsubscript{NPMI}",
     "Diversity",
     "WEC\\textsubscript{in}",
+    "WEC\\textsubscript{ex}",
 ]
 
 
@@ -109,7 +111,7 @@ def format_cells(table: pd.DataFrame) -> pd.DataFrame:
 
 MODEL_ORDER = [
     "S³",
-    "KeyNMF",
+    # "KeyNMF",
     "GMM",
     "Top2Vec",
     "BERTopic",
@@ -127,7 +129,6 @@ EMBEDDING_ORDER = [
 ]
 
 DATASET_ORDER = [
-    "20 Newsgroups Preprocessed",
     "20 Newsgroups Raw",
     "BBC News",
     "ArXiv ML Papers",
@@ -195,3 +196,21 @@ def produce_full_table(
         lines.extend(produce_encoder_rows(encoder_entries[encoder], encoder))
     lines.extend(produce_footer())
     return "\n".join(lines)
+
+
+results_folder = Path("results/")
+files = results_folder.glob("*.jsonl")
+out_path = Path("tables/", "main_table.tex")
+out_path.parent.mkdir(exist_ok=True)
+encoder_entries = dict()
+for result_file in files:
+    encoder_name = Path(result_file).stem.replace("__", "/")
+    with open(result_file) as in_file:
+        # Allows for comments if we want to exclude models.
+        entries = [
+            json.loads(line) for line in in_file if not line.startswith("#")
+        ]
+    encoder_entries[encoder_name] = entries
+table = produce_full_table(encoder_entries)
+with open(out_path, "w") as out_file:
+    out_file.write(table)

@@ -33,7 +33,7 @@ python3 -m topic_benchmark run -e "embedding_model_name"
 
 ### `table`
 
-Creates a latex table of the results of the benchmark. (Main table in the paper)
+Creates a latex table of the results of the benchmark.
 
 ```bash
 python3 -m topic_benchmark table -o results.tex
@@ -44,22 +44,9 @@ python3 -m topic_benchmark table -o results.tex
 | results_folder | The folder where all result files are located. | `str` | `"results/"` |
 | --out_file (-o) | The output path of the benchmark results. By default, results will be printed to stdout. | `str` | `None` | 
 
-### `figures`
-
-Creates all figures in the paper as `.png` files.
-
-```bash
-python3 -m topic_benchmark figures
-```
-
-| argument | description | type | default |
-| -------- | ----------- | ---- | ------- |
-| results_folder | The folder where all result files are located. | `str` | `"results/"` |
-| --out_file (-o) | Directory where the figures should be placed.  | `str` | `"figures/"` | 
-| --show_figures (-s) | Indicates whether the figures should be displayed in a browser tab or not. | `bool` | `False` | 
-
-## Reproducing paper results
-To reproduce results reported in our paper, please do the following.
+## Reproducing $S^3$ paper results
+Result files to all runs in the $S^3$ publication can be found in the `results/` folder in the repository.
+To reproduce the results reported in our paper, please do the following.
 
 First, install this package by running the following CLI command:
 
@@ -77,15 +64,34 @@ python3 -m topic_benchmark run -e intfloat/e5-large-v2
 
 The results for each embedding model will be found in the `results` folder (unless a value for `--out_file` is explicitly passed).
 
-Each of these commands will compute results for all metrics, all datasets, all topic modeling methods, and all hyperparameters (i.e., number of topics) reported in the paper given a specific embedding model. Note that running these commends can be therefore be very time consuming, due to the large number of models that are estimated and evaluated.
-
-To reproduce the result table reported in the paper, please run: 
-
+To produce figures and tables in the paper, you can use the scripts in the  `s3_paper_scripts/` folder.
 ```bash
-python3 -m topic_benchmark table -o results.tex
+pip install -r s3_paper_scripts/requirements.txt
+
+# Table 3: Main Table (tables/main_table.tex)
+python3 s3_paper_scripts/main_table.py
+
+# Figure 2: Preprocessing effects (figures/effect_of_preprocessing.png)
+python3 s3_paper_scripts/effect_of_preprocessing.py
+
+# Figure 3: Stop word frequency in topic descriptions (figures/stop_freq.png)
+python3 s3_paper_scripts/stop_words_figure.py
+
+# Table 4: Average percentage runtime difference from S^3 (tables/speed.tex)
+python3 s3_paper_scripts/speed.py
+
+# Table 5: Topics in ArXiv ML (tables/arxiv_ml_topics.tex)
+# Figure 4: Compass of Concepts in ArXiv ML (figures/arxiv_ml_map.png)
+python3 s3_paper_scripts/arxiv_ml_compass.py
+
+##################
+#### APPENDIX ####
+##################
+
+# Table 6: NPMI Coherence of topics (tables/npmi_table.tex)
+python3 s3_paper_scripts/npmi_table.py
+
+# Figures 5-9: Disaggregated results (figures/disaggregated_{metric_name}.png)
+python3 s3_paper_scripts/disaggregated_results_figures.py
 ```
 
-To reproduce the figures included in the paper, please run:
-```bash
-python3 -m topic_benchmark figures
-```
