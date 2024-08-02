@@ -42,6 +42,12 @@ cli = Radicli()
         help="What metrics should the models be evaluated on.",
         converter=get_list_converter(str, delimiter=","),
     ),
+    seeds=Arg(
+        "--seeds",
+        "-s",
+        help="What seeds should the models be evaluated on.",
+        converter=get_list_converter(int, delimiter=","),
+    ),
 )
 def run_cli(
     encoder_model: str = "all-MiniLM-L6-v2",
@@ -49,6 +55,7 @@ def run_cli(
     models: Optional[list[str]] = None,
     datasets: Optional[list[str]] = None,
     metrics: Optional[list[str]] = None,
+    seeds: Optional[list[int]] = None,
 ):
     vectorizer = default_vectorizer()
 
@@ -66,6 +73,10 @@ def run_cli(
         encoder_path_name = encoder_model.replace("/", "__")
         out_path = f"results/{encoder_path_name}.jsonl"
 
+    if seeds is None:
+        seeds = (42,)
+    else:
+        seeds = tuple(seeds)
     out_dir = Path(out_path).parent
     out_dir.mkdir(exist_ok=True, parents=True)
     try:
@@ -74,16 +85,19 @@ def run_cli(
             cached_entries: list[BenchmarkEntry] = [
                 json.loads(line) for line in cache_file
             ]
-            done = {
-                (entry["dataset"], entry["model"], entry["n_topics"])
-                for entry in cached_entries
-            }
     except FileNotFoundError:
         with open(out_path, "w") as out_file:
             out_file.write("")
-        done = set()
     print("Running Benchmark.")
-    entries = run_benchmark(encoder, vectorizer, done=done)
+    entries = run_benchmark(
+        encoder,
+        vectorizer,
+        models,
+        datasets,
+        metrics,
+        seeds,
+        prev_entries=cached_entries,
+    )
     for entry in entries:
         with open(out_path, "a") as out_file:
             out_file.write(json.dumps(entry) + "\n")

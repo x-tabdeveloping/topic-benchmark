@@ -93,6 +93,7 @@ def run_benchmark(
     models: Optional[list[str]] = None,
     datasets: Optional[list[str]] = None,
     metrics: Optional[list[str]] = None,
+    seeds: tuple[int] = (42),
     prev_entries: Iterable[Union[BenchmarkEntry, BenchmarkError]] = (),
 ) -> Iterable[Union[BenchmarkEntry, BenchmarkError]]:
     for dataset_name, dataset_loader in dataset_registry.get_all().items():
@@ -110,27 +111,32 @@ def run_benchmark(
             n_topics = list(range(10, 51, 10))
             for n_components in n_topics:
                 print(f" - Evaluating on {n_components} topics")
-                model = loader(n_components=n_components)
-                try:
-                    start_time = time.time()
-                    topic_data = model.prepare_topic_data(corpus, embeddings)
-                    end_time = time.time()
-                    topic_descriptions = get_top_k(topic_data, top_k=10)
-                    res = evaluate_topics(
-                        topic_data, metrics=metrics, dataset_name=dataset_name
-                    )
-                    yield BenchmarkEntry(
-                        dataset=dataset_name,
-                        model=model_name,
-                        n_topics=n_components,
-                        topic_descriptions=topic_descriptions,
-                        runtime_s=end_time - start_time,
-                        results=res,
-                    )
-                except Exception as e:
-                    yield BenchmarkError(
-                        dataset=dataset_name,
-                        model=model_name,
-                        error_message=str(e),
-                        n_topics=n_components,
-                    )
+                for seed in seeds:
+                    model = loader(n_components=n_components, seed=seed)
+                    try:
+                        start_time = time.time()
+                        topic_data = model.prepare_topic_data(
+                            corpus, embeddings
+                        )
+                        end_time = time.time()
+                        topic_descriptions = get_top_k(topic_data, top_k=10)
+                        res = evaluate_topics(
+                            topic_data,
+                            metrics=metrics,
+                            dataset_name=dataset_name,
+                        )
+                        yield BenchmarkEntry(
+                            dataset=dataset_name,
+                            model=model_name,
+                            n_topics=n_components,
+                            topic_descriptions=topic_descriptions,
+                            runtime_s=end_time - start_time,
+                            results=res,
+                        )
+                    except Exception as e:
+                        yield BenchmarkError(
+                            dataset=dataset_name,
+                            model=model_name,
+                            error_message=str(e),
+                            n_topics=n_components,
+                        )
