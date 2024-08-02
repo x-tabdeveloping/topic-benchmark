@@ -9,13 +9,6 @@ from sentence_transformers import SentenceTransformer
 
 from topic_benchmark.benchmark import BenchmarkEntry, run_benchmark
 from topic_benchmark.defaults import default_vectorizer
-from topic_benchmark.figures_plt import (
-    plot_nonalphabetical,
-    plot_speed,
-    plot_speed_v2,
-    plot_stop_words,
-    preprocess_for_plotting,
-)
 from topic_benchmark.registries import encoder_registry
 from topic_benchmark.table import produce_full_table
 
