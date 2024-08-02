@@ -43,10 +43,19 @@ def load_iwec() -> Metric:
     based on WEC."""
     top_k = 10
 
+    # Cache for w2v models over corpora
+    w2v_cache: dict[str, Word2Vec] = {}
+
     def score(data: TopicData, dataset_name: Optional[str]):
-        tokenizer = CountVectorizer(vocabulary=data["vocab"]).build_analyzer()
-        texts = [tokenizer(text) for text in data["corpus"]]
-        model = Word2Vec(texts, min_count=1)
+        if dataset_name not in w2v_cache:
+            tokenizer = CountVectorizer(
+                vocabulary=data["vocab"]
+            ).build_analyzer()
+            texts = [tokenizer(text) for text in data["corpus"]]
+            model = Word2Vec(texts, min_count=1)
+            w2v_cache[dataset_name] = model
+        else:
+            model = w2v_cache[dataset_name]
         topics = get_top_k(data, top_k)
         return word_embedding_coherence(topics, model.wv)
 
