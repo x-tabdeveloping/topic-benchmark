@@ -51,7 +51,7 @@ To reproduce the results reported in our paper, please do the following.
 First, install this package by running the following command:
 
 ```bash
-pip install topic-benchmark
+pip install topic-benchmark==0.3.0
 ```
 
 Then, reproduce results for all the embedding models tested in the paper by running the following CLI commands:
