@@ -3,18 +3,12 @@ import warnings
 from pathlib import Path
 from typing import Optional
 
-import pandas as pd
 from radicli import Arg, Radicli, get_list_converter
 from sentence_transformers import SentenceTransformer
 
 from topic_benchmark.benchmark import BenchmarkEntry, run_benchmark
 from topic_benchmark.defaults import default_vectorizer
-from topic_benchmark.registries import (
-    dataset_registry,
-    encoder_registry,
-    metric_registry,
-    model_registry,
-)
+from topic_benchmark.registries import encoder_registry
 from topic_benchmark.table import produce_full_table
 
 cli = Radicli()

@@ -1,4 +1,5 @@
 import time
+from collections import namedtuple
 from typing import Iterable, Optional, TypedDict, Union
 
 from sklearn.base import clone
@@ -17,6 +18,7 @@ class BenchmarkEntry(TypedDict):
     dataset: str
     model: str
     n_topics: int
+    seed: int
     topic_descriptions: list[list[str]]
     runtime_s: float
     results: dict[str, float]
@@ -26,50 +28,17 @@ class BenchmarkError(TypedDict):
     dataset: str
     model: str
     n_topics: int
+    seed: int
     error_message: str
 
 
-def evaluate_model(
-    dataset_name: str,
-    model_name: str,
-    corpus,
-    embeddings,
-    loader: Loader,
-    n_topics: list[int],
-    done: set[tuple[str, str, int]],
-) -> Iterable[Union[BenchmarkEntry, BenchmarkError]]:
-    for n_components in n_topics:
-        print(f" - Evaluating on {n_components} topics")
-        if (dataset_name, model_name, n_components) in done:
-            print(f"Model {model_name}({n_components}) already done, skipping")
-            continue
-        model = loader(n_components=n_components)
-        try:
-            start_time = time.time()
-            topic_data = model.prepare_topic_data(corpus, embeddings)
-            end_time = time.time()
-        except Exception as e:
-            yield BenchmarkError(
-                dataset=dataset_name,
-                model=model_name,
-                error_message=str(e),
-                n_topics=n_components,
-            )
-            continue
-        topic_descriptions = get_top_k(topic_data, top_k=10)
-        res = {}
-        for metric_name, metric_loader in metric_registry.get_all().items():
-            metric = metric_loader()
-            score = metric(topic_data)
-            res[metric_name] = float(score)
-        yield BenchmarkEntry(
-            dataset=dataset_name,
-            model=model_name,
-            n_topics=n_components,
-            topic_descriptions=topic_descriptions,
-            runtime_s=end_time - start_time,
-            results=res,
-        )
+EntryID = namedtuple("EntryID", ["dataset", "model", "n_topics", "seed"])
+
+
+def get_entry_id(entry: Union[BenchmarkError, BenchmarkEntry]) -> EntryID:
+    return EntryID(
+        entry["dataset"], entry["model"], entry["n_topics"], entry["seed"]
+    )
 
 
 def evaluate_topics(
@@ -96,6 +65,7 @@ def run_benchmark(
     seeds: tuple[int] = (42),
     prev_entries: Iterable[Union[BenchmarkEntry, BenchmarkError]] = (),
 ) -> Iterable[Union[BenchmarkEntry, BenchmarkError]]:
+    done = set([get_entry_id(entry) for entry in prev_entries])
     for dataset_name, dataset_loader in dataset_registry.get_all().items():
         if (datasets is not None) and (dataset_name not in datasets):
             continue
@@ -112,6 +82,16 @@ def run_benchmark(
             for n_components in n_topics:
                 print(f" - Evaluating on {n_components} topics")
                 for seed in seeds:
+                    current_id = EntryID(
+                        dataset=dataset_name,
+                        model=model_name,
+                        seed=seed,
+                        n_topics=n_topics,
+                    )
+                    if current_id in done:
+                        print(
+                            f"Entry {current_id} already completed, skipping."
+                        )
                     model = loader(n_components=n_components, seed=seed)
                     try:
                         start_time = time.time()
@@ -128,6 +108,7 @@ def run_benchmark(
                         yield BenchmarkEntry(
                             dataset=dataset_name,
                             model=model_name,
+                            seed=seed,
                             n_topics=n_components,
                             topic_descriptions=topic_descriptions,
                             runtime_s=end_time - start_time,
@@ -136,6 +117,7 @@ def run_benchmark(
                     except Exception as e:
                         yield BenchmarkError(
                             dataset=dataset_name,
+                            seed=seed,
                             model=model_name,
                             error_message=str(e),
                             n_topics=n_components,
