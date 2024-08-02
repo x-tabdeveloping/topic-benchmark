@@ -23,7 +23,7 @@ def word_embedding_coherence(topics, wv):
     return np.nanmean(arrays)
 
 
-@metric_registry.register("Word Embedding Coherence")
+@metric_registry.register("wec_ex")
 def load_wec() -> Metric:
     top_k = 10
     wv = api.load("word2vec-google-news-300")
@@ -35,7 +35,7 @@ def load_wec() -> Metric:
     return score
 
 
-@metric_registry.register("IWEC")
+@metric_registry.register("wec_in")
 def load_iwec() -> Metric:
     """Internal word embedding coherence:
     Trains word2vec model on the corpus, then uses it to evaluate

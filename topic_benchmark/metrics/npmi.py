@@ -8,7 +8,7 @@ from topic_benchmark.registries import metric_registry
 from topic_benchmark.utils import get_top_k
 
 
-@metric_registry.register("NPMI Coherence")
+@metric_registry.register("c_npmi")
 def load_npmi() -> Metric:
     top_k = 10
 

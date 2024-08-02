@@ -7,7 +7,7 @@ from topic_benchmark.registries import metric_registry
 from topic_benchmark.utils import get_top_k
 
 
-@metric_registry.register("Diversity")
+@metric_registry.register("diversity")
 def load_diversity() -> Metric:
     top_k = 10
 
