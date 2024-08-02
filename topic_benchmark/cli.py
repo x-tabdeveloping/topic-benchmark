@@ -80,6 +80,7 @@ def run_cli(
                 json.loads(line) for line in cache_file
             ]
     except FileNotFoundError:
+        cached_entries = []
         with open(out_path, "w") as out_file:
             out_file.write("")
     print("Running Benchmark.")

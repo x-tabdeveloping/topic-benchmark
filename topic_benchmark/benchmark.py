@@ -51,7 +51,7 @@ def evaluate_topics(
         if (metrics is not None) and (metric_name not in metrics):
             continue
         metric = metric_loader()
-        score = metric(topic_data)
+        score = metric(topic_data, dataset_name=dataset_name)
         res[metric_name] = float(score)
     return res
 
@@ -86,7 +86,7 @@ def run_benchmark(
                         dataset=dataset_name,
                         model=model_name,
                         seed=seed,
-                        n_topics=n_topics,
+                        n_topics=n_components,
                     )
                     if current_id in done:
                         print(
