@@ -11,8 +11,7 @@ class TopicModel(Protocol):
         corpus: list[str],
         *args: Any,
         **kwargs: Any,
-    ) -> TopicData:
-        ...
+    ) -> TopicData: ...
 
 
 Loader = Callable[[int], TopicModel]

@@ -4,12 +4,17 @@ from pathlib import Path
 from typing import Optional
 
 import pandas as pd
-from radicli import Arg, Radicli
+from radicli import Arg, Radicli, get_list_converter
 from sentence_transformers import SentenceTransformer
 
 from topic_benchmark.benchmark import BenchmarkEntry, run_benchmark
 from topic_benchmark.defaults import default_vectorizer
-from topic_benchmark.registries import encoder_registry
+from topic_benchmark.registries import (
+    dataset_registry,
+    encoder_registry,
+    metric_registry,
+    model_registry,
+)
 from topic_benchmark.table import produce_full_table
 
 cli = Radicli()
@@ -19,9 +24,31 @@ cli = Radicli()
     "run",
     encoder_model=Arg("--encoder_model", "-e"),
     out_path=Arg("--out_file", "-o"),
+    models=Arg(
+        "--models",
+        "-m",
+        help="What subsection of models should the benchmark be run on.",
+        converter=get_list_converter(str, delimiter=","),
+    ),
+    datasets=Arg(
+        "--datasets",
+        "-d",
+        help="What datasets should the models be evaluated on.",
+        converter=get_list_converter(str, delimiter=","),
+    ),
+    metrics=Arg(
+        "--metrics",
+        "-t",
+        help="What metrics should the models be evaluated on.",
+        converter=get_list_converter(str, delimiter=","),
+    ),
 )
 def run_cli(
-    encoder_model: str = "all-MiniLM-L6-v2", out_path: Optional[str] = None
+    encoder_model: str = "all-MiniLM-L6-v2",
+    out_path: Optional[str] = None,
+    models: Optional[list[str]] = None,
+    datasets: Optional[list[str]] = None,
+    metrics: Optional[list[str]] = None,
 ):
     vectorizer = default_vectorizer()
 
