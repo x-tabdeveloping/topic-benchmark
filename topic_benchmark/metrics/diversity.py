@@ -1,4 +1,5 @@
 from itertools import chain
+from typing import Optional
 
 from turftopic.data import TopicData
 
@@ -11,7 +12,7 @@ from topic_benchmark.utils import get_top_k
 def load_diversity() -> Metric:
     top_k = 10
 
-    def score(data: TopicData) -> float:
+    def score(data: TopicData, dataset_name: Optional[str]) -> float:
         topics = get_top_k(data, top_k)
         unique_words = set(chain.from_iterable(topics))
         total_words = top_k * len(topics)

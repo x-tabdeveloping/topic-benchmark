@@ -1,4 +1,5 @@
 import itertools
+from typing import Optional
 
 import gensim.downloader as api
 import numpy as np
@@ -28,7 +29,7 @@ def load_wec() -> Metric:
     top_k = 10
     wv = api.load("word2vec-google-news-300")
 
-    def score(data: TopicData):
+    def score(data: TopicData, dataset_name: Optional[str]):
         topics = get_top_k(data, top_k)
         return word_embedding_coherence(topics, wv)
 
@@ -42,7 +43,7 @@ def load_iwec() -> Metric:
     based on WEC."""
     top_k = 10
 
-    def score(data: TopicData):
+    def score(data: TopicData, dataset_name: Optional[str]):
         tokenizer = CountVectorizer(vocabulary=data["vocab"]).build_analyzer()
         texts = [tokenizer(text) for text in data["corpus"]]
         model = Word2Vec(texts, min_count=1)
