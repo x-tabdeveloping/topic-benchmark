@@ -35,6 +35,18 @@ def load_s3(encoder, vectorizer: CountVectorizer) -> Loader:
         SemanticSignalSeparation,
         encoder=encoder,
         vectorizer=vectorizer,
+        feature_importance="extreme",
+        random_state=42,
+    )
+
+
+@model_registry.register("S³_strong")
+def load_s3_strong(encoder, vectorizer: CountVectorizer) -> Loader:
+    return partial(
+        SemanticSignalSeparation,
+        encoder=encoder,
+        vectorizer=vectorizer,
+        feature_importance="strong",
         random_state=42,
     )
 
