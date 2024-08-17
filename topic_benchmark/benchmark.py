@@ -92,6 +92,7 @@ def run_benchmark(
                         print(
                             f"Entry {current_id} already completed, skipping."
                         )
+                        continue
                     model = loader(n_components=n_components, seed=seed)
                     try:
                         start_time = time.time()
