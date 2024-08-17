@@ -49,9 +49,11 @@ models = [
     "LDA",
     "CombinedTM",
     "ZeroShotTM",
+    "FASTopic",
     "Top2Vec",
     "S³",
 ]
+data = data[data["model"].isin(models)]
 fig = go.Figure()
 fig = fig.add_box(
     x=data["model"],

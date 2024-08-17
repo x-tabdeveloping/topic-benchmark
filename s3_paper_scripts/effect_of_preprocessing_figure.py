@@ -72,6 +72,7 @@ models = [
     "CombinedTM",
     "ZeroShotTM",
     "BERTopic",
+    "FASTopic",
     "Top2Vec",
     "S³",
 ]

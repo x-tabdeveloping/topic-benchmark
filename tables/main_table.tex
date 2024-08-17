@@ -1,0 +1,62 @@
+\begin{table*}[p]
+\bgroup
+\resizebox{\textwidth}{!}{
+\def\arraystretch{1.3}
+\begin{tabular}{lccccccccc}
+\toprule
+ & \multicolumn{3}{c}{\textbf{20 Newsgroups Raw}} & \multicolumn{3}{c}{\textbf{BBC News}} & \multicolumn{3}{c}{\textbf{ArXiv ML Papers}}\\
+ & Diversity & WEC\textsubscript{in} & WEC\textsubscript{ex} & Diversity & WEC\textsubscript{in} & WEC\textsubscript{ex} & Diversity & WEC\textsubscript{in} & WEC\textsubscript{ex}\\
+\midrule
+\midrule
+\textbf{average\_word\_embeddings\_glove.6B.300d} & & & & & & & & &\\
+\midrule
+S³ & \underline{0.98 ± \textit{.03}} & 0.46 ± \textit{.09} & \textbf{0.29 ± \textit{.01}} & \underline{0.94 ± \textit{.06}} & \textbf{0.93 ± \textit{.01}} & \underline{0.25 ± \textit{.03}} & \underline{0.93 ± \textit{.07}} & \textbf{0.89 ± \textit{.01}} & \underline{0.23 ± \textit{.06}}\\
+FASTopic & \textbf{1 ± \textit{0}} & \textbf{0.52 ± \textit{.04}} & 0.22 ± \textit{.01} & \textbf{0.99 ± \textit{.01}} & \underline{0.91 ± \textit{.02}} & 0.20 ± \textit{.03} & \textbf{0.99 ± \textit{.01}} & \underline{0.87 ± \textit{.04}} & 0.16 ± \textit{.02}\\
+Top2Vec & 0.30 ± \textit{.52} & 0.41 ± \textit{.13} & \underline{0.26 ± \textit{.03}} & 0.63 ± \textit{.00} & 0.78 ± \textit{.01} & 0.25 ± \textit{.00} & 0.20 ± \textit{.05} & 0.78 ± \textit{.01} & \textbf{0.25 ± \textit{.00}}\\
+BERTopic & 0.63 ± \textit{.07} & 0.42 ± \textit{.04} & 0.21 ± \textit{.04} & 0.40 ± \textit{.00} & 0.57 ± \textit{.01} & \textbf{0.29 ± \textit{.00}} & 0.37 ± \textit{.01} & 0.56 ± \textit{.01} & 0.20 ± \textit{.02}\\
+CombinedTM & 0.88 ± \textit{.02} & 0.42 ± \textit{.03} & 0.19 ± \textit{.03} & 0.89 ± \textit{.04} & 0.85 ± \textit{.03} & 0.16 ± \textit{.01} & 0.80 ± \textit{.04} & 0.74 ± \textit{.06} & 0.13 ± \textit{.01}\\
+ZeroShotTM & 0.91 ± \textit{.06} & 0.44 ± \textit{.04} & 0.19 ± \textit{.03} & 0.84 ± \textit{.15} & 0.83 ± \textit{.05} & 0.18 ± \textit{.01} & 0.74 ± \textit{.20} & 0.74 ± \textit{.01} & 0.15 ± \textit{.02}\\
+NMF & 0.54 ± \textit{.06} & \underline{0.48 ± \textit{.05}} & 0.24 ± \textit{.04} & 0.47 ± \textit{.03} & 0.62 ± \textit{.08} & 0.24 ± \textit{.04} & 0.55 ± \textit{.06} & 0.60 ± \textit{.15} & 0.17 ± \textit{.03}\\
+LDA & 0.40 ± \textit{.07} & 0.40 ± \textit{.05} & 0.23 ± \textit{.04} & 0.37 ± \textit{.10} & 0.64 ± \textit{.08} & 0.23 ± \textit{.07} & 0.40 ± \textit{.04} & 0.62 ± \textit{.07} & 0.20 ± \textit{.04}\\
+\midrule
+\textbf{all-MiniLM-L6-v2} & & & & & & & & &\\
+\midrule
+S³ & \underline{0.99 ± \textit{.01}} & 0.45 ± \textit{.02} & \underline{0.28 ± \textit{.05}} & \underline{0.92 ± \textit{.07}} & \underline{0.92 ± \textit{.01}} & 0.24 ± \textit{.09} & \underline{0.94 ± \textit{.06}} & \textbf{0.91 ± \textit{.02}} & \textbf{0.20 ± \textit{.01}}\\
+FASTopic & \textbf{1 ± \textit{0}} & \textbf{0.51 ± \textit{.02}} & 0.20 ± \textit{.02} & \textbf{1.00 ± \textit{.01}} & 0.90 ± \textit{.02} & 0.21 ± \textit{.01} & \textbf{1.00 ± \textit{.00}} & \underline{0.88 ± \textit{.02}} & 0.16 ± \textit{.02}\\
+Top2Vec & 0.95 ± \textit{.09} & \underline{0.49 ± \textit{.02}} & \textbf{0.37 ± \textit{.02}} & 0.78 ± \textit{.00} & \textbf{0.93 ± \textit{.00}} & \textbf{0.26 ± \textit{.00}} & 0.47 ± \textit{.04} & 0.84 ± \textit{.01} & 0.17 ± \textit{.02}\\
+BERTopic & 0.53 ± \textit{.21} & 0.42 ± \textit{.08} & 0.20 ± \textit{.06} & 0.50 ± \textit{.00} & 0.61 ± \textit{.00} & \underline{0.26 ± \textit{.00}} & 0.35 ± \textit{.02} & 0.57 ± \textit{.02} & 0.19 ± \textit{.04}\\
+CombinedTM & 0.88 ± \textit{.04} & 0.40 ± \textit{.04} & 0.18 ± \textit{.03} & 0.91 ± \textit{.08} & 0.86 ± \textit{.02} & 0.16 ± \textit{.02} & 0.81 ± \textit{.07} & 0.74 ± \textit{.08} & 0.13 ± \textit{.03}\\
+ZeroShotTM & 0.89 ± \textit{.07} & 0.45 ± \textit{.03} & 0.18 ± \textit{.02} & 0.82 ± \textit{.08} & 0.83 ± \textit{.03} & 0.17 ± \textit{.02} & 0.77 ± \textit{.10} & 0.75 ± \textit{.04} & 0.13 ± \textit{.01}\\
+NMF & 0.54 ± \textit{.06} & 0.48 ± \textit{.05} & 0.24 ± \textit{.04} & 0.47 ± \textit{.03} & 0.62 ± \textit{.09} & 0.24 ± \textit{.04} & 0.55 ± \textit{.06} & 0.60 ± \textit{.15} & 0.17 ± \textit{.03}\\
+LDA & 0.40 ± \textit{.07} & 0.40 ± \textit{.05} & 0.23 ± \textit{.04} & 0.37 ± \textit{.10} & 0.64 ± \textit{.09} & 0.23 ± \textit{.07} & 0.40 ± \textit{.04} & 0.62 ± \textit{.06} & \underline{0.20 ± \textit{.04}}\\
+\midrule
+\textbf{all-mpnet-base-v2} & & & & & & & & &\\
+\midrule
+S³ & \underline{0.99 ± \textit{.01}} & 0.42 ± \textit{.04} & \underline{0.26 ± \textit{.02}} & \underline{0.93 ± \textit{.04}} & \underline{0.92 ± \textit{.02}} & \underline{0.24 ± \textit{.05}} & 0.90 ± \textit{.05} & \textbf{0.90 ± \textit{.01}} & \underline{0.22 ± \textit{.02}}\\
+FASTopic & \textbf{1 ± \textit{0}} & \textbf{0.52 ± \textit{.02}} & 0.19 ± \textit{.01} & \textbf{1.00 ± \textit{.01}} & 0.90 ± \textit{.01} & 0.21 ± \textit{.02} & \underline{1.00 ± \textit{.00}} & \underline{0.88 ± \textit{.04}} & 0.16 ± \textit{.02}\\
+Top2Vec & 0.93 ± \textit{.10} & \underline{0.49 ± \textit{.02}} & \textbf{0.38 ± \textit{.03}} & 0.90 ± \textit{.06} & \textbf{0.93 ± \textit{.01}} & \textbf{0.33 ± \textit{.02}} & 0.90 ± \textit{.00} & 0.84 ± \textit{.01} & 0.17 ± \textit{.00}\\
+BERTopic & 0.50 ± \textit{.23} & 0.38 ± \textit{.02} & 0.19 ± \textit{.05} & 0.39 ± \textit{.00} & 0.59 ± \textit{.02} & 0.24 ± \textit{.01} & \textbf{1 ± \textit{0}} & 0.51 ± \textit{.01} & \textbf{0.32 ± \textit{.00}}\\
+CombinedTM & 0.88 ± \textit{.03} & 0.40 ± \textit{.06} & 0.18 ± \textit{.02} & 0.89 ± \textit{.05} & 0.84 ± \textit{.06} & 0.16 ± \textit{.02} & 0.80 ± \textit{.06} & 0.73 ± \textit{.08} & 0.13 ± \textit{.02}\\
+ZeroShotTM & 0.91 ± \textit{.05} & 0.44 ± \textit{.05} & 0.19 ± \textit{.03} & 0.85 ± \textit{.07} & 0.83 ± \textit{.05} & 0.18 ± \textit{.04} & 0.77 ± \textit{.14} & 0.74 ± \textit{.03} & 0.13 ± \textit{.00}\\
+NMF & 0.54 ± \textit{.06} & 0.48 ± \textit{.05} & 0.24 ± \textit{.04} & 0.47 ± \textit{.03} & 0.62 ± \textit{.08} & 0.24 ± \textit{.04} & 0.55 ± \textit{.06} & 0.60 ± \textit{.15} & 0.17 ± \textit{.03}\\
+LDA & 0.36 ± \textit{.05} & 0.40 ± \textit{.10} & 0.23 ± \textit{.05} & 0.37 ± \textit{.10} & 0.64 ± \textit{.09} & 0.23 ± \textit{.07} & 0.40 ± \textit{.04} & 0.62 ± \textit{.06} & 0.20 ± \textit{.04}\\
+\midrule
+\textbf{intfloat/e5-large-v2} & & & & & & & & &\\
+\midrule
+S³ & \underline{0.97 ± \textit{.03}} & 0.41 ± \textit{.05} & \textbf{0.28 ± \textit{.05}} & \underline{0.93 ± \textit{.06}} & \textbf{0.92 ± \textit{.01}} & 0.23 ± \textit{.06} & \underline{0.91 ± \textit{.03}} & \textbf{0.90 ± \textit{.02}} & \underline{0.22 ± \textit{.06}}\\
+FASTopic & \textbf{0.99 ± \textit{.02}} & 0.42 ± \textit{.03} & 0.16 ± \textit{.01} & \textbf{1 ± \textit{0}} & 0.90 ± \textit{.02} & 0.17 ± \textit{.02} & \textbf{0.98 ± \textit{.04}} & \underline{0.86 ± \textit{.03}} & 0.13 ± \textit{.02}\\
+Top2Vec & 0.43 ± \textit{.08} & 0.25 ± \textit{.04} & 0.21 ± \textit{.01} & 0.89 ± \textit{.00} & \underline{0.91 ± \textit{.01}} & 0.22 ± \textit{.00} & 0.28 ± \textit{.04} & 0.78 ± \textit{.01} & \textbf{0.31 ± \textit{.00}}\\
+BERTopic & 0.71 ± \textit{.12} & 0.37 ± \textit{.04} & 0.18 ± \textit{.02} & 0.40 ± \textit{.00} & 0.56 ± \textit{.01} & \textbf{0.28 ± \textit{.00}} & 0.41 ± \textit{.05} & 0.60 ± \textit{.04} & 0.19 ± \textit{.04}\\
+CombinedTM & 0.91 ± \textit{.06} & 0.42 ± \textit{.03} & 0.18 ± \textit{.02} & 0.90 ± \textit{.07} & 0.84 ± \textit{.04} & 0.16 ± \textit{.02} & 0.80 ± \textit{.05} & 0.75 ± \textit{.06} & 0.13 ± \textit{.03}\\
+ZeroShotTM & 0.90 ± \textit{.06} & \underline{0.42 ± \textit{.03}} & 0.18 ± \textit{.02} & 0.80 ± \textit{.09} & 0.82 ± \textit{.05} & 0.17 ± \textit{.02} & 0.68 ± \textit{.22} & 0.72 ± \textit{.02} & 0.14 ± \textit{.01}\\
+NMF & 0.54 ± \textit{.06} & \textbf{0.48 ± \textit{.05}} & 0.24 ± \textit{.05} & 0.47 ± \textit{.03} & 0.62 ± \textit{.08} & \underline{0.24 ± \textit{.04}} & 0.55 ± \textit{.06} & 0.60 ± \textit{.15} & 0.17 ± \textit{.03}\\
+LDA & 0.39 ± \textit{.08} & 0.42 ± \textit{.10} & \underline{0.25 ± \textit{.05}} & 0.37 ± \textit{.10} & 0.64 ± \textit{.09} & 0.23 ± \textit{.07} & 0.40 ± \textit{.04} & 0.62 ± \textit{.06} & 0.20 ± \textit{.04}\\
+\bottomrule
+\label{table:evaluation}
+\end{tabular}
+}
+\egroup
+\caption{ Coherence and Diversity of Topics over Multiple Datasets \\
+\textit{Best in bold, second best underlined, uncertainty represents $2 \cdot SD$}
+}
+\end{table*}

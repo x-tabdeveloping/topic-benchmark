@@ -108,8 +108,9 @@ def format_cells(table: pd.DataFrame) -> pd.DataFrame:
 
 MODEL_ORDER = [
     "S³",
+    "FASTopic",
     # "KeyNMF",
-    "GMM",
+    # "GMM",
     "Top2Vec",
     "BERTopic",
     "CombinedTM",
@@ -134,13 +135,14 @@ DATASET_ORDER = [
 
 def produce_body(groups: list[pd.DataFrame]) -> list[str]:
     groups = [group.reset_index().set_index("model") for group in groups]
-    models = set()
+    model_set = set()
     for group in groups:
-        models |= set(group.index)
-    models = [model for model in MODEL_ORDER if model in models]
+        model_set |= set(group.index)
     formatted = [format_cells(group) for group in groups]
     lines = []
-    for model in models:
+    for model in MODEL_ORDER:
+        if model not in model_set:
+            print(f"WARNING: model '{model}' not present in data.")
         row = []
         for group in formatted:
             try:

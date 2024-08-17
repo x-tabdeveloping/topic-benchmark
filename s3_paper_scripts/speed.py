@@ -40,7 +40,19 @@ def percent_s3(data: pd.DataFrame):
     return data
 
 
+MODELS = [
+    "S³",
+    "FASTopic",
+    "Top2Vec",
+    "BERTopic",
+    "CombinedTM",
+    "ZeroShotTM",
+    "NMF",
+    "LDA",
+]
+
 data = pd.DataFrame.from_records(entries)
+data = data[data["model"].isin(MODELS)]
 data = data[data["dataset"] != "20 Newsgroups Preprocessed"]
 data = data[["model", "runtime_s", "n_topics", "dataset", "encoder"]]
 # data = data[~data["model"].isin(["NMF", "LDA"])]

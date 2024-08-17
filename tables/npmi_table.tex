@@ -1,0 +1,62 @@
+\begin{table*}[p]
+\bgroup
+\resizebox{\textwidth}{!}{
+\def\arraystretch{1.3}
+\begin{tabular}{lccc}
+\toprule
+ & \multicolumn{1}{c}{\textbf{20 Newsgroups Raw}} & \multicolumn{1}{c}{\textbf{BBC News}} & \multicolumn{1}{c}{\textbf{ArXiv ML Papers}}\\
+ & C\textsubscript{NPMI} & C\textsubscript{NPMI} & C\textsubscript{NPMI}\\
+\midrule
+\midrule
+\textbf{average\_word\_embeddings\_glove.6B.300d} & & &\\
+\midrule
+S³ & -0.16 ± \textit{.05} & -0.24 ± \textit{.05} & -0.30 ± \textit{.06}\\
+FASTopic & -0.03 ± \textit{.06} & -0.08 ± \textit{.13} & -0.16 ± \textit{.09}\\
+Top2Vec & -0.03 ± \textit{.04} & -0.06 ± \textit{.00} & -0.10 ± \textit{.00}\\
+BERTopic & 0.04 ± \textit{.10} & -0.02 ± \textit{.00} & \underline{-0.02 ± \textit{.00}}\\
+CombinedTM & -0.04 ± \textit{.09} & -0.04 ± \textit{.04} & -0.06 ± \textit{.04}\\
+ZeroShotTM & -0.00 ± \textit{.01} & \underline{0.01 ± \textit{.01}} & -0.04 ± \textit{.02}\\
+NMF & \underline{0.09 ± \textit{.02}} & 0.01 ± \textit{.02} & \textbf{0.01 ± \textit{.02}}\\
+LDA & 0.03 ± \textit{.03} & -0.03 ± \textit{.04} & -0.06 ± \textit{.01}\\
+\midrule
+\textbf{all-MiniLM-L6-v2} & & &\\
+\midrule
+S³ & -0.21 ± \textit{.04} & -0.29 ± \textit{.09} & -0.32 ± \textit{.03}\\
+FASTopic & -0.03 ± \textit{.05} & -0.07 ± \textit{.13} & -0.14 ± \textit{.09}\\
+Top2Vec & -0.14 ± \textit{.06} & -0.30 ± \textit{.00} & -0.27 ± \textit{.00}\\
+BERTopic & 0.04 ± \textit{.01} & -0.01 ± \textit{.00} & -0.01 ± \textit{.01}\\
+CombinedTM & -0.04 ± \textit{.08} & -0.03 ± \textit{.03} & -0.06 ± \textit{.04}\\
+ZeroShotTM & -0.02 ± \textit{.02} & -0.02 ± \textit{.03} & -0.06 ± \textit{.03}\\
+NMF & 0.09 ± \textit{.02} & 0.01 ± \textit{.02} & \underline{0.01 ± \textit{.02}}\\
+LDA & 0.03 ± \textit{.03} & -0.03 ± \textit{.04} & -0.06 ± \textit{.01}\\
+\midrule
+\textbf{all-mpnet-base-v2} & & &\\
+\midrule
+S³ & -0.22 ± \textit{.02} & -0.27 ± \textit{.11} & -0.34 ± \textit{.03}\\
+FASTopic & -0.05 ± \textit{.03} & -0.08 ± \textit{.11} & -0.15 ± \textit{.10}\\
+Top2Vec & -0.15 ± \textit{.02} & -0.20 ± \textit{.01} & -0.32 ± \textit{.00}\\
+BERTopic & 0.02 ± \textit{.06} & -0.01 ± \textit{.01} & -0.06 ± \textit{.00}\\
+CombinedTM & -0.04 ± \textit{.13} & -0.03 ± \textit{.02} & -0.07 ± \textit{.02}\\
+ZeroShotTM & -0.00 ± \textit{.04} & -0.01 ± \textit{.05} & -0.04 ± \textit{.01}\\
+NMF & 0.09 ± \textit{.02} & 0.01 ± \textit{.02} & \textbf{0.01 ± \textit{.02}}\\
+LDA & 0.03 ± \textit{.02} & -0.03 ± \textit{.04} & -0.06 ± \textit{.01}\\
+\midrule
+\textbf{intfloat/e5-large-v2} & & &\\
+\midrule
+S³ & -0.24 ± \textit{.03} & -0.31 ± \textit{.05} & -0.33 ± \textit{.03}\\
+FASTopic & -0.15 ± \textit{.05} & -0.12 ± \textit{.14} & -0.24 ± \textit{.07}\\
+Top2Vec & -0.25 ± \textit{.01} & -0.28 ± \textit{.00} & -0.28 ± \textit{.01}\\
+BERTopic & 0.08 ± \textit{.04} & -0.02 ± \textit{.00} & \underline{-0.00 ± \textit{.02}}\\
+CombinedTM & -0.03 ± \textit{.05} & -0.04 ± \textit{.06} & -0.06 ± \textit{.03}\\
+ZeroShotTM & -0.03 ± \textit{.06} & -0.03 ± \textit{.03} & -0.04 ± \textit{.01}\\
+NMF & \underline{0.09 ± \textit{.02}} & \underline{0.01 ± \textit{.02}} & \textbf{0.01 ± \textit{.02}}\\
+LDA & 0.04 ± \textit{.05} & -0.03 ± \textit{.04} & -0.06 ± \textit{.01}\\
+\bottomrule
+\label{table:evaluation}
+\end{tabular}
+}
+\egroup
+\caption{ Coherence and Diversity of Topics over Multiple Datasets \\
+\textit{Best in bold, second best underlined, uncertainty represents $2 \cdot SD$}
+}
+\end{table*}

@@ -1,7 +1,7 @@
 from functools import partial
 
 from sklearn.feature_extraction.text import CountVectorizer
-from turftopic import (GMM, AutoEncodingTopicModel, KeyNMF,
+from turftopic import (GMM, AutoEncodingTopicModel, FASTopic, KeyNMF,
                        SemanticSignalSeparation)
 
 from topic_benchmark.base import Loader
@@ -34,6 +34,17 @@ def load_keynmf(encoder, vectorizer: CountVectorizer) -> Loader:
     return _load
 
 
+@model_registry.register("FASTopic")
+def load_fastopic(encoder, vectorizer: CountVectorizer) -> Loader:
+    def _load(n_components: int, seed: int):
+        return FASTopic(
+            n_components,
+            encoder=encoder,
+            vectorizer=vectorizer,
+            random_state=seed,
+        )
+    return _load
+
 @model_registry.register("S³")
 def load_s3(encoder, vectorizer: CountVectorizer) -> Loader:
     def _load(n_components: int, seed: int):
@@ -46,6 +57,7 @@ def load_s3(encoder, vectorizer: CountVectorizer) -> Loader:
         )
 
     return _load
+
 
 
 @model_registry.register("S³_strong")
