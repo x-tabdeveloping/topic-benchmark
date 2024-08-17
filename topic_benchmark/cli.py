@@ -80,9 +80,10 @@ def run_cli(
             for line in cache_file:
                 if line.startswith("#"):
                     continue
-                if not line.strip():
+                line = line.strip()
+                if not line:
                     continue
-                cached_entries.append(json.loads(line).strip())
+                cached_entries.append(json.loads(line))
     except FileNotFoundError:
         cached_entries = []
         with open(out_path, "w") as out_file:
