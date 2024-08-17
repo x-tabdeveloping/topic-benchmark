@@ -74,11 +74,15 @@ def run_cli(
     out_dir = Path(out_path).parent
     out_dir.mkdir(exist_ok=True, parents=True)
     try:
+        cached_entries: list[BenchmarkEntry] = []
         with open(out_path, "r") as cache_file:
             print("Loading already completed results")
-            cached_entries: list[BenchmarkEntry] = [
-                json.loads(line) for line in cache_file
-            ]
+            for line in cache_file:
+                if line.startswith("#"):
+                    continue
+                if not line.strip():
+                    continue
+                cached_entries.append(json.loads(line).strip())
     except FileNotFoundError:
         cached_entries = []
         with open(out_path, "w") as out_file:
