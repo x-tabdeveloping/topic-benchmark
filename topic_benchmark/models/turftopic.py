@@ -1,8 +1,13 @@
 from functools import partial
 
 from sklearn.feature_extraction.text import CountVectorizer
-from turftopic import (GMM, AutoEncodingTopicModel, FASTopic, KeyNMF,
-                       SemanticSignalSeparation)
+from turftopic import (
+    GMM,
+    AutoEncodingTopicModel,
+    FASTopic,
+    KeyNMF,
+    SemanticSignalSeparation,
+)
 
 from topic_benchmark.base import Loader
 from topic_benchmark.registries import model_registry
@@ -43,7 +48,9 @@ def load_fastopic(encoder, vectorizer: CountVectorizer) -> Loader:
             vectorizer=vectorizer,
             random_state=seed,
         )
+
     return _load
+
 
 @model_registry.register("S³")
 def load_s3(encoder, vectorizer: CountVectorizer) -> Loader:
@@ -53,14 +60,13 @@ def load_s3(encoder, vectorizer: CountVectorizer) -> Loader:
             encoder=encoder,
             vectorizer=vectorizer,
             random_state=seed,
-            feature_importance="exterme",
+            feature_importance="axial",
         )
 
     return _load
 
 
-
-@model_registry.register("S³_strong")
+@model_registry.register("S³_angular")
 def load_s3_strong(encoder, vectorizer: CountVectorizer) -> Loader:
     def _load(n_components: int, seed: int):
         return SemanticSignalSeparation(
@@ -68,7 +74,21 @@ def load_s3_strong(encoder, vectorizer: CountVectorizer) -> Loader:
             encoder=encoder,
             vectorizer=vectorizer,
             random_state=seed,
-            feature_importance="strong",
+            feature_importance="angular",
+        )
+
+    return _load
+
+
+@model_registry.register("S³_combined")
+def load_s3_combined(encoder, vectorizer: CountVectorizer) -> Loader:
+    def _load(n_components: int, seed: int):
+        return SemanticSignalSeparation(
+            n_components,
+            encoder=encoder,
+            vectorizer=vectorizer,
+            random_state=seed,
+            feature_importance="combined",
         )
 
     return _load
