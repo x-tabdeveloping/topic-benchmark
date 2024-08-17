@@ -1,12 +1,8 @@
 from functools import partial
 
 from sklearn.feature_extraction.text import CountVectorizer
-from turftopic import (
-    GMM,
-    AutoEncodingTopicModel,
-    KeyNMF,
-    SemanticSignalSeparation,
-)
+from turftopic import (GMM, AutoEncodingTopicModel, KeyNMF,
+                       SemanticSignalSeparation)
 
 from topic_benchmark.base import Loader
 from topic_benchmark.registries import model_registry
@@ -46,6 +42,21 @@ def load_s3(encoder, vectorizer: CountVectorizer) -> Loader:
             encoder=encoder,
             vectorizer=vectorizer,
             random_state=seed,
+            feature_importance="exterme",
+        )
+
+    return _load
+
+
+@model_registry.register("S³_strong")
+def load_s3_strong(encoder, vectorizer: CountVectorizer) -> Loader:
+    def _load(n_components: int, seed: int):
+        return SemanticSignalSeparation(
+            n_components,
+            encoder=encoder,
+            vectorizer=vectorizer,
+            random_state=seed,
+            feature_importance="strong",
         )
 
     return _load
