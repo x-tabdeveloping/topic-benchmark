@@ -17,6 +17,7 @@ CATEGORY_ORDERS = {
     ],
     "Model": [
         "S³",
+        "FASTopic",
         "Top2Vec",
         "BERTopic",
         "CombinedTM",
@@ -34,7 +35,8 @@ CATEGORY_ORDERS = {
 
 models2colors = {
     "S³": "#5D5DE6",
-    "Top2Vec": "#BD4F6C",
+    "Top2Vec": "#77BA99",
+    "FASTopic": "#BD4F6C",
     "BERTopic": "#D7816A",
     "CombinedTM": "#F0CF65",
     "ZeroShotTM": "#DDEDAA",
@@ -71,7 +73,9 @@ def set_plt_params(SCALE):
 def plot_disaggregated(data: pd.DataFrame, metric: str):
     data["Model"] = data["model"]
     data["Dataset"] = data["dataset"]
-    data["Encoder"] = data["encoder"]
+    data["Encoder"] = data["encoder"].replace(
+        "average_word_embeddings_glove.6B.300d", "GloVe"
+    )
     data["Number of Topics"] = data["n_topics"]
     set_plt_params(SCALE=2)
     # sns.set_style('whitegrid', {"grid.linestyle": ":",})

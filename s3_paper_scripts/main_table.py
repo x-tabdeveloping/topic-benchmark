@@ -111,8 +111,9 @@ def format_cells(table: pd.DataFrame) -> pd.DataFrame:
 
 MODEL_ORDER = [
     "S³",
+    "FASTopic",
     # "KeyNMF",
-    "GMM",
+    # "GMM",
     "Top2Vec",
     "BERTopic",
     "CombinedTM",
@@ -206,10 +207,14 @@ encoder_entries = dict()
 for result_file in files:
     encoder_name = Path(result_file).stem.replace("__", "/")
     with open(result_file) as in_file:
-        # Allows for comments if we want to exclude models.
-        entries = [
-            json.loads(line) for line in in_file if not line.startswith("#")
-        ]
+        entries = []
+        for line in in_file:
+            # Allows for comments if we want to exclude models.
+            if line.startswith("#"):
+                continue
+            entry = json.loads(line)
+            if entry["model"] in MODEL_ORDER:
+                entries.append(entry)
     encoder_entries[encoder_name] = entries
 table = produce_full_table(encoder_entries)
 with open(out_path, "w") as out_file:
