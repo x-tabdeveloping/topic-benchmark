@@ -10,6 +10,7 @@ from turftopic.data import TopicData
 
 from topic_benchmark.models._ecrtm import ECRTMModule
 from topic_benchmark.defaults import default_vectorizer
+from topic_benchmark.registries import model_registry
 
 
 class ECRTM:
@@ -48,6 +49,7 @@ class ECRTM:
         return optimizer
 
     def _train_model(self, document_term_matrix):
+        torch.manual_seed(self.random_state)
         self.model = ECRTMModule(vocab_size=document_term_matrix.shape[1], num_topics=self.n_components)
         self.model = self.model.to(self.device)
         optimizer = self.make_optimizer(self.learning_rate)
@@ -131,3 +133,15 @@ class ECRTM:
             "topic_names": [],
         }
         return res
+
+@model_registry.register("ECRTM")
+def load_ecrtm(encoder, vectorizer: CountVectorizer) -> Loader:
+    def _load(n_components: int, seed: int):
+        return ECRTM(
+            n_components,
+            vectorizer=vectorizer,
+            random_state=seed,
+        )
+
+    return _load
+
