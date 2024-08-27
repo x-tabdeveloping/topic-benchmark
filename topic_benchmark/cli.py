@@ -86,7 +86,7 @@ def run_cli(
                 "Loading using `SentenceTransformer`"
             )
     if seeds is None:
-        seeds = (42,)
+        seeds = (42, 43, 44, 45, 46)
     else:
         seeds = tuple(seeds)
     out_dir = Path(out_dir)
