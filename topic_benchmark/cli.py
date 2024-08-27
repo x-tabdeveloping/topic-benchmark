@@ -1,23 +1,41 @@
 import json
 import warnings
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Union
 
 from radicli import Arg, Radicli, get_list_converter
 from sentence_transformers import SentenceTransformer
 
-from topic_benchmark.benchmark import BenchmarkEntry, run_benchmark
+from topic_benchmark.benchmark import BenchmarkEntry, run_benchmark, BenchmarkError
 from topic_benchmark.defaults import default_vectorizer
 from topic_benchmark.registries import encoder_registry
 from topic_benchmark.table import produce_full_table
+
+def load_cache(file: Path) -> list[Union[BenchmarkEntry, BenchmarkError]]:
+    try:
+        cached_entries: list[BenchmarkEntry] = []
+        with file.open("r") as cache_file:
+            print("Loading already completed results")
+            for line in cache_file:
+                if line.startswith("#"):
+                    continue
+                line = line.strip()
+                if not line:
+                    continue
+                cached_entries.append(json.loads(line))
+        return cached_entries
+    except FileNotFoundError:
+        with file.open("w") as out_file:
+            out_file.write("")
+        return []
 
 cli = Radicli()
 
 
 @cli.command(
     "run",
-    encoder_model=Arg("--encoder_model", "-e"),
-    out_path=Arg("--out_file", "-o"),
+    out_dir=Arg("--out_dir", "-o", help="OUtput directory for the results."),
+    encoder_model=Arg("--encoders", "-e", help="Which encoders should be used for conducting runs?"),
     models=Arg(
         "--models",
         "-m",
@@ -44,8 +62,8 @@ cli = Radicli()
     ),
 )
 def run_cli(
-    encoder_model: str = "all-MiniLM-L6-v2",
-    out_path: Optional[str] = None,
+    out_dir: str = "results/",
+    encoders: Optiona[list[str]] = None,
     models: Optional[list[str]] = None,
     datasets: Optional[list[str]] = None,
     metrics: Optional[list[str]] = None,
@@ -53,54 +71,45 @@ def run_cli(
 ):
     vectorizer = default_vectorizer()
 
-    print("Loading Encoder.")
-    if encoder_model in encoder_registry:
-        encoder = encoder_registry.get(encoder_model)()
-    else:
-        encoder = SentenceTransformer(encoder_model)
-        print(
-            f"`{encoder_model}`: encoder model not found in registry. "
-            "Loading using `SentenceTransformer`"
-        )
-
-    if out_path is None:
-        encoder_path_name = encoder_model.replace("/", "__")
-        out_path = f"results/{encoder_path_name}.jsonl"
-
+    if encoders is None:
+        encoders = ["all-MiniLM-L6-v2", "all-mpnet-base-v2", "average_word_embeddings_glove.6B.300d", "intfloat/e5-large-v2"]
+    print("Loading Encoders.")
+    encoder_models = []
+    for encoder_name in encoders:
+        if encoder_name in encoder_registry:
+            encoder_model = encoder_registry.get(encoder_name)()
+            encoder_models.append(encoder_model)
+        else:
+            encoder_model = SentenceTransformer(encoder_name)
+            print(
+                f"`{encoder_name}`: encoder model not found in registry. "
+                "Loading using `SentenceTransformer`"
+            )
     if seeds is None:
         seeds = (42,)
     else:
         seeds = tuple(seeds)
-    out_dir = Path(out_path).parent
+    out_dir = Path(out_dir)
     out_dir.mkdir(exist_ok=True, parents=True)
-    try:
-        cached_entries: list[BenchmarkEntry] = []
-        with open(out_path, "r") as cache_file:
-            print("Loading already completed results")
-            for line in cache_file:
-                if line.startswith("#"):
-                    continue
-                line = line.strip()
-                if not line:
-                    continue
-                cached_entries.append(json.loads(line))
-    except FileNotFoundError:
-        cached_entries = []
-        with open(out_path, "w") as out_file:
-            out_file.write("")
-    print("Running Benchmark.")
-    entries = run_benchmark(
-        encoder,
-        vectorizer,
-        models,
-        datasets,
-        metrics,
-        seeds,
-        prev_entries=cached_entries,
-    )
-    for entry in entries:
-        with open(out_path, "a") as out_file:
-            out_file.write(json.dumps(entry) + "\n")
+    for encoder_name, encoder in zip(encoders, encoder_models):
+        print(f"Running benchmark with {encoder_name}")
+        encoder_path_name = encoder_model.replace("/", "__")
+        out_path = out_dir.joinpath(f"{encoder_path_name}.jsonl")
+        out_path = f"results/{encoder_path_name}.jsonl"
+        cached_entries = load_cache(out_path)
+        print("Running Benchmark.")
+        entries = run_benchmark(
+            encoder,
+            vectorizer,
+            models,
+            datasets,
+            metrics,
+            seeds,
+            prev_entries=cached_entries,
+        )
+        for entry in entries:
+            with open(out_path, "a") as out_file:
+                out_file.write(json.dumps(entry) + "\n")
     print("DONE")
 
 
