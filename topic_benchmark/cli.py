@@ -74,26 +74,23 @@ def run_cli(
     if encoders is None:
         encoders = ["all-MiniLM-L6-v2", "all-mpnet-base-v2", "average_word_embeddings_glove.6B.300d", "intfloat/e5-large-v2"]
     print("Loading Encoders.")
-    encoder_models = []
-    for encoder_name in encoders:
-        if encoder_name in encoder_registry:
-            encoder_model = encoder_registry.get(encoder_name)()
-            encoder_models.append(encoder_model)
-        else:
-            encoder_model = SentenceTransformer(encoder_name)
-            print(
-                f"`{encoder_name}`: encoder model not found in registry. "
-                "Loading using `SentenceTransformer`"
-            )
     if seeds is None:
         seeds = (42, 43, 44, 45, 46)
     else:
         seeds = tuple(seeds)
     out_dir = Path(out_dir)
     out_dir.mkdir(exist_ok=True, parents=True)
-    for encoder_name, encoder in zip(encoders, encoder_models):
+    for encoder_name in encoders:
+        if encoder_name in encoder_registry:
+            encoder = encoder_registry.get(encoder_name)()
+        else:
+            encoder = SentenceTransformer(encoder_name)
+            print(
+                f"`{encoder_name}`: encoder model not found in registry. "
+                "Loading using `SentenceTransformer`"
+            )
         print(f"Running benchmark with {encoder_name}")
-        encoder_path_name = encoder_model.replace("/", "__")
+        encoder_path_name = encoder_name.replace("/", "__")
         out_path = out_dir.joinpath(f"{encoder_path_name}.jsonl")
         out_path = f"results/{encoder_path_name}.jsonl"
         cached_entries = load_cache(out_path)
