@@ -34,8 +34,8 @@ cli = Radicli()
 
 @cli.command(
     "run",
-    out_dir=Arg("--out_dir", "-o", help="OUtput directory for the results."),
-    encoder_model=Arg("--encoders", "-e", help="Which encoders should be used for conducting runs?"),
+    out_dir=Arg("--out_dir", "-o", help="Output directory for the results."),
+    encoders=Arg("--encoders", "-e", help="Which encoders should be used for conducting runs?"),
     models=Arg(
         "--models",
         "-m",
@@ -63,7 +63,7 @@ cli = Radicli()
 )
 def run_cli(
     out_dir: str = "results/",
-    encoders: Optiona[list[str]] = None,
+    encoders: Optional[list[str]] = None,
     models: Optional[list[str]] = None,
     datasets: Optional[list[str]] = None,
     metrics: Optional[list[str]] = None,

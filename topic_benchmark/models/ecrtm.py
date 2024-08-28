@@ -11,6 +11,7 @@ from turftopic.data import TopicData
 from topic_benchmark.models._ecrtm import ECRTMModule
 from topic_benchmark.defaults import default_vectorizer
 from topic_benchmark.registries import model_registry
+from topic_benchmark.base import Loader
 
 
 class ECRTM:
