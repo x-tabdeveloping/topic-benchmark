@@ -6,10 +6,12 @@ from typing import Optional, Union
 from radicli import Arg, Radicli, get_list_converter
 from sentence_transformers import SentenceTransformer
 
-from topic_benchmark.benchmark import BenchmarkEntry, run_benchmark, BenchmarkError
+from topic_benchmark.benchmark import (BenchmarkEntry, BenchmarkError,
+                                       run_benchmark)
 from topic_benchmark.defaults import default_vectorizer
 from topic_benchmark.registries import encoder_registry
 from topic_benchmark.table import produce_full_table
+
 
 def load_cache(file: Path) -> list[Union[BenchmarkEntry, BenchmarkError]]:
     if not isinstance(file, Path):
@@ -31,13 +33,18 @@ def load_cache(file: Path) -> list[Union[BenchmarkEntry, BenchmarkError]]:
             out_file.write("")
         return []
 
+
 cli = Radicli()
 
 
 @cli.command(
     "run",
     out_dir=Arg("--out_dir", "-o", help="Output directory for the results."),
-    encoders=Arg("--encoders", "-e", help="Which encoders should be used for conducting runs?"),
+    encoders=Arg(
+        "--encoders",
+        "-e",
+        help="Which encoders should be used for conducting runs?",
+    ),
     models=Arg(
         "--models",
         "-m",
@@ -74,7 +81,12 @@ def run_cli(
     vectorizer = default_vectorizer()
 
     if encoders is None:
-        encoders = ["all-MiniLM-L6-v2", "all-mpnet-base-v2", "average_word_embeddings_glove.6B.300d", "intfloat/e5-large-v2"]
+        encoders = [
+            "all-MiniLM-L6-v2",
+            "all-mpnet-base-v2",
+            "average_word_embeddings_glove.6B.300d",
+            "intfloat/e5-large-v2",
+        ]
     print("Loading Encoders.")
     if seeds is None:
         seeds = (42, 43, 44, 45, 46)
@@ -91,12 +103,13 @@ def run_cli(
                 f"`{encoder_name}`: encoder model not found in registry. "
                 "Loading using `SentenceTransformer`"
             )
-        print(f"Running benchmark with {encoder_name}")
         encoder_path_name = encoder_name.replace("/", "__")
         out_path = out_dir.joinpath(f"{encoder_path_name}.jsonl")
         out_path = f"results/{encoder_path_name}.jsonl"
         cached_entries = load_cache(out_path)
-        print("Running Benchmark.")
+        print("--------------------------------------")
+        print(f"Running benchmark with {encoder_name}")
+        print("--------------------------------------")
         entries = run_benchmark(
             encoder,
             vectorizer,

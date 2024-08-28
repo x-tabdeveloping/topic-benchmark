@@ -1,16 +1,15 @@
+import io
 import time
 from collections import namedtuple
+from contextlib import redirect_stdout
 from typing import Iterable, Optional, TypedDict, Union
 
 from sklearn.base import clone
 from sklearn.feature_extraction.text import CountVectorizer
 
 from topic_benchmark.base import Loader, TopicModel
-from topic_benchmark.registries import (
-    dataset_registry,
-    metric_registry,
-    model_registry,
-)
+from topic_benchmark.registries import (dataset_registry, metric_registry,
+                                        model_registry)
 from topic_benchmark.utils import get_top_k
 
 
@@ -48,6 +47,7 @@ def evaluate_topics(
 ) -> dict[str, float]:
     res = {}
     for metric_name, metric_loader in metric_registry.get_all().items():
+        print(f"            - Evaluating on {metric_name}")
         if (metrics is not None) and (metric_name not in metrics):
             continue
         metric = metric_loader()
@@ -70,9 +70,13 @@ def run_benchmark(
         if (datasets is not None) and (dataset_name not in datasets):
             continue
         print(f"Evaluating models on {dataset_name}")
+        print("....................................")
         corpus = dataset_loader()
         embeddings = encoder.encode(corpus)
         for model_name, model_loader in model_registry.get_all().items():
+            print("   -------------------------")
+            print(f"   |Evaluating {model_name}|")
+            print("   _________________________")
             if (models is not None) and (model_name not in models):
                 continue
             loader = model_loader(
@@ -80,8 +84,9 @@ def run_benchmark(
             )
             n_topics = list(range(10, 51, 10))
             for n_components in n_topics:
-                print(f" - Evaluating on {n_components} topics")
+                print(f"    - {n_components} topics")
                 for seed in seeds:
+                    print(f"      - Seed: {seed}")
                     current_id = EntryID(
                         dataset=dataset_name,
                         model=model_name,
@@ -90,15 +95,17 @@ def run_benchmark(
                     )
                     if current_id in done:
                         print(
-                            f"Entry {current_id} already completed, skipping."
+                            f"         Entry {current_id} already completed, skipping."
                         )
                         continue
                     model = loader(n_components=n_components, seed=seed)
                     try:
                         start_time = time.time()
-                        topic_data = model.prepare_topic_data(
-                            corpus, embeddings
-                        )
+                        faux_stdout = io.StringIO()
+                        with redirect_stdout(faux_stdout):
+                            topic_data = model.prepare_topic_data(
+                                corpus, embeddings
+                            )
                         end_time = time.time()
                         topic_descriptions = get_top_k(topic_data, top_k=10)
                         res = evaluate_topics(
