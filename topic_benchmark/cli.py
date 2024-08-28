@@ -12,6 +12,8 @@ from topic_benchmark.registries import encoder_registry
 from topic_benchmark.table import produce_full_table
 
 def load_cache(file: Path) -> list[Union[BenchmarkEntry, BenchmarkError]]:
+    if not isinstance(file, Path):
+        file = Path(file)
     try:
         cached_entries: list[BenchmarkEntry] = []
         with file.open("r") as cache_file:
