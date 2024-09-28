@@ -6,6 +6,8 @@ along with scripts for producing tables and figures for the S3 paper.
 
 ## Usage
 
+### **TODO: Rewrite this section**
+
 ### Installation
 
 You can install the package from PyPI.
