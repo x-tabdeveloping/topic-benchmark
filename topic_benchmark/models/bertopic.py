@@ -9,16 +9,18 @@ from topic_benchmark.registries import model_registry
 
 @model_registry.register("BERTopic")
 def load_bertopic(encoder, vectorizer: CountVectorizer) -> Loader:
-    dim_red = UMAP(
-        n_neighbors=15, n_components=5, metric="cosine", random_state=42
-    )
-    clustering = HDBSCAN(
-        min_cluster_size=15,
-        metric="euclidean",
-        cluster_selection_method="eom",
-    )
-
-    def _load(n_components: int):
+    def _load(n_components: int, seed: int):
+        dim_red = UMAP(
+            n_neighbors=15,
+            n_components=5,
+            metric="cosine",
+            random_state=seed,
+        )
+        clustering = HDBSCAN(
+            min_cluster_size=15,
+            metric="euclidean",
+            cluster_selection_method="eom",
+        )
         return ClusteringTopicModel(
             encoder=encoder,
             vectorizer=vectorizer,

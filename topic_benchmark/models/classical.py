@@ -83,8 +83,8 @@ def make_topic_pipeline(
 
 @model_registry.register("NMF")
 def load_nmf(encoder, vectorizer: CountVectorizer) -> Loader:
-    def _load(n_components: int):
-        model = NMF(n_components, random_state=42)
+    def _load(n_components: int, seed: int):
+        model = NMF(n_components, random_state=seed)
         return make_topic_pipeline(vectorizer, model)
 
     return _load
@@ -92,8 +92,8 @@ def load_nmf(encoder, vectorizer: CountVectorizer) -> Loader:
 
 @model_registry.register("LDA")
 def load_lda(encoder, vectorizer: CountVectorizer) -> Loader:
-    def _load(n_components: int):
-        model = LatentDirichletAllocation(n_components, random_state=42)
+    def _load(n_components: int, seed: int):
+        model = LatentDirichletAllocation(n_components, random_state=seed)
         return make_topic_pipeline(vectorizer, model)
 
     return _load

@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from typing import Any, Callable, Protocol
+from typing import Any, Callable, Optional, Protocol
 
 from turftopic.data import TopicData
 
@@ -11,10 +11,9 @@ class TopicModel(Protocol):
         corpus: list[str],
         *args: Any,
         **kwargs: Any,
-    ) -> TopicData:
-        ...
+    ) -> TopicData: ...
 
 
-Loader = Callable[[int], TopicModel]
+Loader = Callable[[int, int], TopicModel]
 
-Metric = Callable[[TopicData], float]
+Metric = Callable[[TopicData, Optional[str]], float]

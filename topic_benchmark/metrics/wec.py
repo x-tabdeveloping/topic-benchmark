@@ -1,4 +1,5 @@
 import itertools
+from typing import Optional
 
 import gensim.downloader as api
 import numpy as np
@@ -23,29 +24,38 @@ def word_embedding_coherence(topics, wv):
     return np.nanmean(arrays)
 
 
-@metric_registry.register("Word Embedding Coherence")
+@metric_registry.register("wec_ex")
 def load_wec() -> Metric:
     top_k = 10
     wv = api.load("word2vec-google-news-300")
 
-    def score(data: TopicData):
+    def score(data: TopicData, dataset_name: Optional[str]):
         topics = get_top_k(data, top_k)
         return word_embedding_coherence(topics, wv)
 
     return score
 
 
-@metric_registry.register("IWEC")
+@metric_registry.register("wec_in")
 def load_iwec() -> Metric:
     """Internal word embedding coherence:
     Trains word2vec model on the corpus, then uses it to evaluate
     based on WEC."""
     top_k = 10
 
-    def score(data: TopicData):
-        tokenizer = CountVectorizer(vocabulary=data["vocab"]).build_analyzer()
-        texts = [tokenizer(text) for text in data["corpus"]]
-        model = Word2Vec(texts, min_count=1)
+    # Cache for w2v models over corpora
+    w2v_cache: dict[str, Word2Vec] = {}
+
+    def score(data: TopicData, dataset_name: Optional[str]):
+        if dataset_name not in w2v_cache:
+            tokenizer = CountVectorizer(
+                vocabulary=data["vocab"]
+            ).build_analyzer()
+            texts = [tokenizer(text) for text in data["corpus"]]
+            model = Word2Vec(texts, min_count=1)
+            w2v_cache[dataset_name] = model
+        else:
+            model = w2v_cache[dataset_name]
         topics = get_top_k(data, top_k)
         return word_embedding_coherence(topics, model.wv)
 
