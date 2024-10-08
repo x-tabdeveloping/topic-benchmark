@@ -1,3 +1,4 @@
+import os
 import itertools
 from typing import Optional
 
@@ -13,6 +14,7 @@ from topic_benchmark.cli import run_cli
 from topic_benchmark.registries import dataset_registry, metric_registry
 from topic_benchmark.utils import get_top_k
 
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 def external_coherence(topics, embedding_model: SentenceTransformer):
     arrays = []
@@ -69,4 +71,5 @@ if __name__ == "__main__":
         datasets=["ArXiv ML Papers", "BBC News", "20 Newsgroups Raw", "TNews"],
         metrics=["diversity", "c_npmi", "wec_in", "ec_ex"],
         seeds=[42],
+        out_dir="results/chinese",
     )
