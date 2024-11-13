@@ -1,8 +1,9 @@
 import json
 import warnings
 from pathlib import Path
-from typing import Optional, Union
+from typing import Iterable, Optional, Union
 
+from datasets import Dataset
 from radicli import Arg, Radicli, get_list_converter
 from sentence_transformers import SentenceTransformer
 
@@ -154,3 +155,46 @@ def make_table(
     else:
         with open(out_path, "w") as out_file:
             out_file.write(table)
+
+
+def stream_results(results_folder: str) -> Iterable[dict]:
+    files = Path(results_folder).glob("*.jsonl")
+    for result_file in files:
+        encoder_name = Path(result_file).stem.replace("__", "/")
+        with open(result_file) as in_file:
+            for line in in_file:
+                if not line.strip():
+                    continue
+                # Allows for comments if we want to exclude models.
+                if line.startswith("#"):
+                    continue
+                entry = json.loads(line)
+                if "error_message" in entry:
+                    error_message = entry.pop("error_message")
+                    print(
+                        f"Not including entry {entry} due to error: {error_message}"
+                    )
+                    continue
+                entry["encoder"] = encoder_name
+                res = entry.pop("results")
+                entry = {**entry, **res}
+                yield entry
+
+
+@cli.command(
+    "push_to_hub",
+    hf_repo=Arg(help="HuggingFace repository to push results to."),
+    results_folder=Arg(
+        help="Folder containing results for all embedding models."
+    ),
+)
+def push_to_hub(
+    hf_repo: str,
+    results_folder: str = "results/",
+):
+    results = list(stream_results(results_folder))
+    results = {
+        field: [entry[field] for entry in results] for field in results[0]
+    }
+    ds = Dataset.from_dict(results)
+    ds.push_to_hub(hf_repo)
