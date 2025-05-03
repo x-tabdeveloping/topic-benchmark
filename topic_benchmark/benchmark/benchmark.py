@@ -7,31 +7,11 @@ from typing import Iterable, Optional, TypedDict, Union
 from sklearn.base import clone
 from sklearn.feature_extraction.text import CountVectorizer
 
-from topic_benchmark.base import Loader, TopicModel
+from topic_benchmark.base import (BenchmarkEntry, BenchmarkError, EntryID,
+                                  Loader, TopicModel)
 from topic_benchmark.registries import (dataset_registry, metric_registry,
                                         model_registry)
 from topic_benchmark.utils import get_top_k
-
-
-class BenchmarkEntry(TypedDict):
-    dataset: str
-    model: str
-    n_topics: int
-    seed: int
-    topic_descriptions: list[list[str]]
-    runtime_s: float
-    results: dict[str, float]
-
-
-class BenchmarkError(TypedDict):
-    dataset: str
-    model: str
-    n_topics: int
-    seed: int
-    error_message: str
-
-
-EntryID = namedtuple("EntryID", ["dataset", "model", "n_topics", "seed"])
 
 
 def get_entry_id(entry: Union[BenchmarkError, BenchmarkEntry]) -> EntryID:
