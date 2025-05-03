@@ -2,6 +2,7 @@ from urllib.request import urlopen
 
 from sklearn.datasets import fetch_20newsgroups
 
+from topic_benchmark.datasets.dataset import Dataset
 from topic_benchmark.registries import dataset_registry
 
 
@@ -15,11 +16,11 @@ def load_newsgroups_clean() -> list[str]:
         for line in lines:
             text, *_ = line.split("\t")
             corpus.append(text)
-    return corpus
+    return Dataset(corpus)
 
 
 @dataset_registry.register("20 Newsgroups Raw")
 def load_newsgroups_raw() -> list[str]:
     ds = fetch_20newsgroups(subset="all")
     corpus = list(ds.data)
-    return corpus
+    return Dataset(corpus)
