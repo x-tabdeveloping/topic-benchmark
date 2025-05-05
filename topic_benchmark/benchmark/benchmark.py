@@ -4,20 +4,60 @@ from collections import namedtuple
 from contextlib import redirect_stdout
 from typing import Iterable, Optional, TypedDict, Union
 
+import numpy as np
 from sklearn.base import clone
 from sklearn.feature_extraction.text import CountVectorizer
+from turftopic.multimodal import (ImageRepr, _load_images,
+                                  _naive_join_embeddings)
 
 from topic_benchmark.base import (BenchmarkEntry, BenchmarkError, EntryID,
                                   Loader, TopicModel)
 from topic_benchmark.registries import (dataset_registry, metric_registry,
                                         model_registry)
-from topic_benchmark.utils import get_top_k
 
 
-def get_entry_id(entry: Union[BenchmarkError, BenchmarkEntry]) -> EntryID:
-    return EntryID(
-        entry["dataset"], entry["model"], entry["n_topics"], entry["seed"]
-    )
+def encode_multimodal(
+    encoder,
+    sentences: list[str],
+    images: list[ImageRepr],
+) -> dict[str, np.ndarray]:
+    """Produce multimodal embeddings of the documents passed to the model."""
+    if len(sentences) != len(images):
+        raise ValueError("Images and documents were not the same length.")
+    if hasattr(encoder, "get_text_embeddings"):
+        text_embeddings = np.array(encoder.get_text_embeddings(sentences))
+    else:
+        text_embeddings = encoder.encode(sentences)
+    embedding_size = text_embeddings.shape[1]
+    images = _load_images(images)
+    if hasattr(encoder, "get_image_embeddings"):
+        image_embeddings = np.array(encoder.get_image_embeddings(list(images)))
+    else:
+        image_embeddings = []
+        for image in images:
+            if image is not None:
+                image_embeddings.append(encoder.encode(image))
+            else:
+                image_embeddings.append(np.full(embedding_size, np.nan))
+        image_embeddings = np.stack(image_embeddings)
+        print(image_embeddings)
+    if hasattr(encoder, "get_fused_embeddings"):
+        document_embeddings = np.array(
+            encoder.get_fused_embeddings(
+                texts=sentences,
+                images=list(images),
+            )
+        )
+    else:
+        document_embeddings = _naive_join_embeddings(
+            text_embeddings, image_embeddings
+        )
+
+    return {
+        "text_embeddings": text_embeddings,
+        "image_embeddings": image_embeddings,
+        "document_embeddings": document_embeddings,
+    }
 
 
 def evaluate_topics(
@@ -43,16 +83,25 @@ def run_benchmark(
     datasets: Optional[list[str]] = None,
     metrics: Optional[list[str]] = None,
     seeds: tuple[int] = (42),
-    prev_entries: Iterable[Union[BenchmarkEntry, BenchmarkError]] = (),
-) -> Iterable[Union[BenchmarkEntry, BenchmarkError]]:
-    done = set([get_entry_id(entry) for entry in prev_entries])
+    prev_entries: Iterable[BenchmarkEntry] = (),
+    multimodal: bool = False,
+) -> Iterable[BenchmarkEntry]:
+    done = set([entry.entry_id for entry in prev_entries])
     for dataset_name, dataset_loader in dataset_registry.get_all().items():
         if (datasets is not None) and (dataset_name not in datasets):
             continue
         print(f"Evaluating models on {dataset_name}")
         print("....................................")
         corpus = dataset_loader()
-        embeddings = encoder.encode(corpus)
+        if multimodal:
+            if not corpus.images:
+                print("Corpus is not multimodal, skipping...")
+                continue
+            embeddings = encode_multimodal(
+                encoder=encoder, sentences=corpus.texts, images=corpus.images
+            )
+        else:
+            embeddings = encoder.encode(corpus)
         for model_name, model_loader in model_registry.get_all().items():
             print("   -------------------------")
             print(f"   |Evaluating {model_name}|")
@@ -83,11 +132,19 @@ def run_benchmark(
                         start_time = time.time()
                         faux_stdout = io.StringIO()
                         with redirect_stdout(faux_stdout):
-                            topic_data = model.prepare_topic_data(
-                                corpus, embeddings
-                            )
+                            if multimodal:
+                                topic_data = (
+                                    model.prepare_multimodal_topic_data(
+                                        corpus.texts,
+                                        images=corpus.images,
+                                        embeddings=embeddings,
+                                    )
+                                )
+                            else:
+                                topic_data = model.prepare_topic_data(
+                                    corpus.texts, embeddings=embeddings
+                                )
                         end_time = time.time()
-                        topic_descriptions = get_top_k(topic_data, top_k=10)
                         res = evaluate_topics(
                             topic_data,
                             metrics=metrics,
@@ -98,12 +155,14 @@ def run_benchmark(
                             model=model_name,
                             seed=seed,
                             n_topics=n_components,
-                            topic_descriptions=topic_descriptions,
+                            topic_descriptions=topic_data.get_top_words(),
+                            top_documents=topic_data.get_top_documents(),
+                            top_images=getattr(topic_data, "top_images", None),
                             runtime_s=end_time - start_time,
                             results=res,
                         )
                     except Exception as e:
-                        yield BenchmarkError(
+                        yield BenchmarkEntry.error(
                             dataset=dataset_name,
                             seed=seed,
                             model=model_name,
