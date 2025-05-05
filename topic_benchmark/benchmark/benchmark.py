@@ -1,5 +1,6 @@
 import io
 import time
+import warnings
 from collections import namedtuple
 from contextlib import redirect_stdout
 from typing import Iterable, Optional, TypedDict, Union
@@ -130,6 +131,12 @@ def run_benchmark(
                         )
                         continue
                     model = loader(n_components=n_components, seed=seed)
+                    if multimodal and not hasattr(
+                        model, "prepare_multimodal_topic_data"
+                    ):
+                        warnings.warn(
+                            f"Model {model_name}({n_components}, seed={seed}) is not multimodal, skipping"
+                        )
                     try:
                         start_time = time.time()
                         faux_stdout = io.StringIO()
