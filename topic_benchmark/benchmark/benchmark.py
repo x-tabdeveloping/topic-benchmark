@@ -95,7 +95,9 @@ def run_benchmark(
         corpus = dataset_loader()
         if multimodal:
             if not corpus.images:
-                print("Corpus is not multimodal, skipping...")
+                warnings.warn(
+                    f"Corpus {dataset_name} is not multimodal, skipping..."
+                )
                 continue
             embeddings = encode_multimodal(
                 encoder=encoder, sentences=corpus.texts, images=corpus.images
