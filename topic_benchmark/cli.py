@@ -1,5 +1,4 @@
 import json
-import warnings
 from pathlib import Path
 from typing import Iterable, Optional, Union
 
@@ -14,7 +13,7 @@ from topic_benchmark.registries import encoder_registry
 from topic_benchmark.table import produce_full_table
 
 
-def load_cache(file: Path) -> list[Union[BenchmarkEntry, BenchmarkError]]:
+def load_cache(file: Path) -> list[BenchmarkEntry]:
     if not isinstance(file, Path):
         file = Path(file)
     try:
@@ -27,7 +26,7 @@ def load_cache(file: Path) -> list[Union[BenchmarkEntry, BenchmarkError]]:
                 line = line.strip()
                 if not line:
                     continue
-                cached_entries.append(json.loads(line))
+                cached_entries.append(BenchmarkEntry.from_json(line))
         return cached_entries
     except FileNotFoundError:
         with file.open("w") as out_file:
@@ -70,6 +69,11 @@ cli = Radicli()
         help="What seeds should the models be evaluated on.",
         converter=get_list_converter(int, delimiter=","),
     ),
+    multimodal=Arg(
+        "--multimodal",
+        "-m",
+        help="Indicates whether the benchmark should be multimodal or not.",
+    ),
 )
 def run_cli(
     out_dir: str = "results/",
@@ -78,6 +82,7 @@ def run_cli(
     datasets: Optional[list[str]] = None,
     metrics: Optional[list[str]] = None,
     seeds: Optional[list[int]] = None,
+    multimodal: bool = False,
 ):
     vectorizer = default_vectorizer()
 
@@ -119,10 +124,11 @@ def run_cli(
             metrics,
             seeds,
             prev_entries=cached_entries,
+            multimodal=multimodal,
         )
         for entry in entries:
             with open(out_path, "a") as out_file:
-                out_file.write(json.dumps(entry) + "\n")
+                out_file.write(entry.to_json() + "\n")
     print("DONE")
 
 
