@@ -109,7 +109,6 @@ def run_cli(
             )
         encoder_path_name = encoder_name.replace("/", "__")
         out_path = out_dir.joinpath(f"{encoder_path_name}.jsonl")
-        out_path = f"results/{encoder_path_name}.jsonl"
         cached_entries = load_cache(out_path)
         print("--------------------------------------")
         print(f"Running benchmark with {encoder_name}")
