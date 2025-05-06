@@ -6,8 +6,7 @@ from datasets import Dataset
 from radicli import Arg, Radicli, get_list_converter
 from sentence_transformers import SentenceTransformer
 
-from topic_benchmark.benchmark import (BenchmarkEntry, BenchmarkError,
-                                       run_benchmark)
+from topic_benchmark.benchmark import BenchmarkEntry, run_benchmark
 from topic_benchmark.defaults import default_vectorizer
 from topic_benchmark.registries import encoder_registry
 from topic_benchmark.table import produce_full_table
@@ -71,7 +70,6 @@ cli = Radicli()
     ),
     multimodal=Arg(
         "--multimodal",
-        "-m",
         help="Indicates whether the benchmark should be multimodal or not.",
     ),
 )

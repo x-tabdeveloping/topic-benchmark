@@ -3,7 +3,7 @@ from typing import Union
 import numpy as np
 import pandas as pd
 
-from topic_benchmark.benchmark import BenchmarkEntry, BenchmarkError
+from topic_benchmark.benchmark import BenchmarkEntry
 
 METRICS_TO_DISPLAY_NAME = {
     "NPMI Coherence": "C\\textsubscript{NPMI}",
@@ -154,7 +154,7 @@ def produce_body(groups: list[pd.DataFrame]) -> list[str]:
 
 
 def produce_encoder_rows(
-    entries: list[Union[BenchmarkEntry, BenchmarkError]],
+    entries: list[BenchmarkEntry],
     encoder_name: str,
 ) -> list[str]:
     """Produces lines in a table for a single embedding model."""
@@ -185,7 +185,7 @@ def produce_encoder_rows(
 
 
 def produce_full_table(
-    encoder_entries: dict[str, Union[BenchmarkEntry, BenchmarkError]],
+    encoder_entries: dict[str, BenchmarkEntry],
 ) -> str:
     """Produces full table for all encoder models."""
     lines = [*produce_header(DATASET_ORDER)]

@@ -11,8 +11,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 from turftopic.multimodal import (ImageRepr, _load_images,
                                   _naive_join_embeddings)
 
-from topic_benchmark.base import (BenchmarkEntry, BenchmarkError, EntryID,
-                                  Loader, TopicModel)
+from topic_benchmark.benchmark.base import BenchmarkEntry, EntryID
 from topic_benchmark.registries import (dataset_registry, metric_registry,
                                         model_registry)
 
@@ -30,9 +29,9 @@ def encode_multimodal(
     else:
         text_embeddings = encoder.encode(sentences)
     embedding_size = text_embeddings.shape[1]
-    images = _load_images(images)
+    images = list(_load_images(images))
     if hasattr(encoder, "get_image_embeddings"):
-        image_embeddings = np.array(encoder.get_image_embeddings(list(images)))
+        image_embeddings = np.array(encoder.get_image_embeddings(images))
     else:
         image_embeddings = []
         for image in images:
@@ -41,12 +40,11 @@ def encode_multimodal(
             else:
                 image_embeddings.append(np.full(embedding_size, np.nan))
         image_embeddings = np.stack(image_embeddings)
-        print(image_embeddings)
     if hasattr(encoder, "get_fused_embeddings"):
         document_embeddings = np.array(
             encoder.get_fused_embeddings(
                 texts=sentences,
-                images=list(images),
+                images=images,
             )
         )
     else:
@@ -106,11 +104,11 @@ def run_benchmark(
         else:
             embeddings = encoder.encode(corpus)
         for model_name, model_loader in model_registry.get_all().items():
+            if (models is not None) and (model_name not in models):
+                continue
             print("   -------------------------")
             print(f"   |Evaluating {model_name}|")
             print("   _________________________")
-            if (models is not None) and (model_name not in models):
-                continue
             loader = model_loader(
                 encoder=encoder, vectorizer=clone(vectorizer)
             )

@@ -4,6 +4,7 @@ from io import BytesIO, StringIO
 from typing import Any, Optional, Type
 
 import msgspec
+import numpy as np
 from PIL import Image
 
 EntryID = namedtuple("EntryID", ["dataset", "model", "n_topics", "seed"])
@@ -15,6 +16,8 @@ def image_enc_hook(obj: Any) -> Any:
         buffer = BytesIO()
         obj.save(buffer, format="JPEG")
         return base64.b64encode(buffer.getvalue()).decode("utf-8")
+    if isinstance(obj, np.str_):
+        return str(obj)
     else:
         # Raise a NotImplementedError for other types
         raise NotImplementedError(
@@ -25,7 +28,7 @@ def image_enc_hook(obj: Any) -> Any:
 def image_dec_hook(type: Type, obj: Any) -> Any:
     # `type` here is the value of the custom type annotation being decoded.
     if type is Image.Image:
-        buffer = StringIO(obj.decode(base64))
+        buffer = BytesIO(base64.b64decode(obj))
         img = Image.open(buffer)
         return img
     else:
@@ -85,7 +88,7 @@ class BenchmarkEntry(msgspec.Struct):
         return msgspec.json.Decoder(cls, dec_hook=image_dec_hook)
 
     def to_json(self):
-        return self.encoder().encode(self)
+        return self.encoder().encode(self).decode("utf-8")
 
     @classmethod
     def from_json(cls, json_str: str):
