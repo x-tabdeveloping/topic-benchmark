@@ -208,6 +208,6 @@ class E5VWrapper(MultimodalEncoder):
             return image_embeddings
 
 
-@encoder_registry.register("royong/e5-v")
+@encoder_registry.register("royokong/e5-v")
 def create_e5_v() -> MultimodalEncoder:
-    return E5VWrapper("royong/e5v")
+    return E5VWrapper("royokong/e5-v")
