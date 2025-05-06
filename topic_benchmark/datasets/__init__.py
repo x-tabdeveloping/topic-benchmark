@@ -1,5 +1,6 @@
 from topic_benchmark.datasets.arxiv_ml import *
 from topic_benchmark.datasets.bbc_news import *
+from topic_benchmark.datasets.ikea import *
 from topic_benchmark.datasets.multimodal import *
 from topic_benchmark.datasets.newsgroups import *
 from topic_benchmark.datasets.stackexchange import *
