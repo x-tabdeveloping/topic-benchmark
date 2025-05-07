@@ -9,22 +9,6 @@ from turftopic.multimodal import ImageRepr
 from topic_benchmark.datasets.dataset import Dataset
 from topic_benchmark.registries import dataset_registry
 
-MRBENCH_DATASETS = [
-    "MRBench/mbeir_visualnews_task3",
-    "MRBench/mbeir_infoseek_task8",
-    "MRBench/mbeir_infoseek_task6",
-    "MRBench/mbeir_oven_task8",
-    "MRBench/mbeir_oven_task6",
-    "MRBench/mbeir_nights_task4",
-    "MRBench/mbeir_edis_task2",
-    "MRBench/mbeir_webqa_task2",
-    "MRBench/mbeir_webqa_task1",
-    "MRBench/mbeir_fashioniq_task7",
-    "MRBench/mbeir_fashion200k_task3",
-    "MRBench/mbeir_cirr_task7",
-    "MRBench/mbeir_mscoco_task3",
-]
-
 MultimodalCorpus = tuple[list[str], list[ImageRepr]]
 
 
@@ -113,12 +97,6 @@ def load_edis():
 @dataset_registry.register("WebQA")
 def load_webqa():
     text, images = get_multimodal_corpus("MRBench/mbeir_webqa_task2")
-    return Dataset(text, images=images)
-
-
-@dataset_registry.register("Fashion200k")
-def load_fashion200k():
-    text, images = get_multimodal_corpus("MRBench/mbeir_fashion200k_task3")
     return Dataset(text, images=images)
 
 

@@ -75,6 +75,17 @@ def evaluate_topics(
     return res
 
 
+MBEIR_TASKS = [
+    "VisualNews",
+    "InfoSeek",
+    "Oven",
+    "Edis",
+    "WebQA",
+    "Fashion200k",
+    "MSCOCO",
+]
+
+
 def run_benchmark(
     encoder,
     vectorizer: CountVectorizer,
@@ -86,6 +97,8 @@ def run_benchmark(
     multimodal: bool = False,
 ) -> Iterable[BenchmarkEntry]:
     done = set([entry.entry_id for entry in prev_entries])
+    if multimodal and (datasets is None):
+        datasets = MBEIR_TASKS
     for dataset_name, dataset_loader in dataset_registry.get_all().items():
         if (datasets is not None) and (dataset_name not in datasets):
             continue
