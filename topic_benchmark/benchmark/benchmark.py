@@ -1,9 +1,8 @@
 import io
 import time
 import warnings
-from collections import namedtuple
 from contextlib import redirect_stdout
-from typing import Iterable, Optional, TypedDict, Union
+from typing import Callable, Iterable, Optional, Union
 
 import numpy as np
 from sklearn.base import clone
@@ -61,16 +60,13 @@ def encode_multimodal(
 
 def evaluate_topics(
     topic_data,
-    metrics: Optional[list[str]] = None,
+    metric_fns: dict[str, Callable],
     dataset_name: Optional[str] = None,
 ) -> dict[str, float]:
     res = {}
-    for metric_name, metric_loader in metric_registry.get_all().items():
+    for metric_name, metric_fn in metric_fns.items():
         print(f"            - Evaluating on {metric_name}")
-        if (metrics is not None) and (metric_name not in metrics):
-            continue
-        metric = metric_loader()
-        score = metric(topic_data, dataset_name=dataset_name)
+        score = metric_fn(topic_data, dataset_name=dataset_name)
         res[metric_name] = float(score)
     return res
 
@@ -99,6 +95,13 @@ def run_benchmark(
     done = set([entry.entry_id for entry in prev_entries])
     if multimodal and (datasets is None):
         datasets = MBEIR_TASKS
+    print("Loading metrics...")
+    metric_fns = {}
+    for metric_name, metric_loader in metric_registry.get_all().items():
+        if (metrics is not None) and (metric_name not in metrics):
+            continue
+        metric_fn = metric_loader()
+        metric_fns[metric_name] = metric_fn
     for dataset_name, dataset_loader in dataset_registry.get_all().items():
         if (datasets is not None) and (dataset_name not in datasets):
             continue
@@ -182,6 +185,9 @@ def run_benchmark(
                             results=res,
                         )
                     except Exception as e:
+                        warnings.warn(
+                            f"Entry {current_id} failed due to error: {e}"
+                        )
                         yield BenchmarkEntry.error(
                             dataset=dataset_name,
                             seed=seed,
