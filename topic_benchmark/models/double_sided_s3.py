@@ -28,10 +28,10 @@ class DoubleS3(SemanticSignalSeparation):
                 corpus, embeddings=embeddings
             )
         # adding the negative sides to the document_topic and topic_term matrices
-        document_topic_matrix = np.concatentate(
+        document_topic_matrix = np.concatenate(
             (document_topic_matrix, -document_topic_matrix), axis=1
         )
-        components = np.concatentate(
+        components = np.concatenate(
             (self.components_, -self.components_), axis=0
         )
         dtm = self.vectorizer.transform(corpus)  # type: ignore
@@ -46,7 +46,7 @@ class DoubleS3(SemanticSignalSeparation):
             transform=getattr(self, "transform", None),
             topic_names=[str(i) for i in classes],
             classes=classes,
-            has_negative_side=self.has_negative_side,
+            has_negative_side=False,
             hierarchy=getattr(self, "hierarchy", None),
         )
         return res
@@ -63,10 +63,10 @@ class DoubleS3(SemanticSignalSeparation):
             corpus, images=images, embeddings=embeddings
         )
         dtm = self.vectorizer.transform(corpus)  # type: ignore
-        document_topic_matrix = np.concatentate(
+        document_topic_matrix = np.concatenate(
             (document_topic_matrix, -document_topic_matrix), axis=1
         )
-        components = np.concatentate(
+        components = np.concatenate(
             (self.components_, -self.components_), axis=0
         )
         classes = list(range(components.shape[0]))
@@ -79,7 +79,7 @@ class DoubleS3(SemanticSignalSeparation):
             document_representation=embeddings["document_embeddings"],
             topic_term_matrix=components,  # type: ignore
             transform=getattr(self, "transform", None),
-            topic_names=self.topic_names,
+            topic_names=[str(i) for i in classes],
             classes=classes,
             has_negative_side=self.has_negative_side,
             hierarchy=getattr(self, "hierarchy", None),
@@ -99,7 +99,7 @@ def load_double_sided_s3(encoder, vectorizer: CountVectorizer) -> Loader:
 
     def _load(n_components: int, seed: int):
         return DoubleS3(
-            n_components,
+            n_components // 2,
             encoder=encoder,
             vectorizer=vectorizer,
             random_state=seed,
