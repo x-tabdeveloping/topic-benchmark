@@ -52,7 +52,7 @@ class BenchmarkResults(Mapping):
                         continue
                     entries.append(entry)
             results[encoder_name] = entries
-        return results
+        return cls(results)
 
     def to_dataframe(self) -> pd.DataFrame:
         records = []
