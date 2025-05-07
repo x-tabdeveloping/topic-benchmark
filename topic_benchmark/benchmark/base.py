@@ -1,6 +1,6 @@
 import base64
 from collections import namedtuple
-from io import BytesIO, StringIO
+from io import BytesIO
 from typing import Any, Optional, Type
 
 import msgspec
@@ -93,3 +93,17 @@ class BenchmarkEntry(msgspec.Struct):
     @classmethod
     def from_json(cls, json_str: str):
         return cls.decoder().decode(json_str.encode("utf-8"))
+
+    def to_dict(self) -> dict:
+        return dict(
+            dataset=self.dataset,
+            model=self.model,
+            n_topics=self.n_topics,
+            seed=self.seed,
+            topic_descriptions=self.topic_descriptions,
+            top_documents=self.top_documents,
+            top_images=self.top_images,
+            runtime_s=self.runtime_s,
+            results=self.results,
+            error_message=self.error_message,
+        )
