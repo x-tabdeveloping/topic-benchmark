@@ -27,7 +27,8 @@ def load_bertopic(encoder, vectorizer: CountVectorizer) -> Loader:
             dimensionality_reduction=dim_red,
             clustering=clustering,
             feature_importance="c-tf-idf",
-            reduction_method="agglomerative",
+            reduction_topic_representation="component",
+            reduction_method="average",
             n_reduce_to=n_components,
         )
 
