@@ -25,12 +25,10 @@ class M3LDataset(Dataset):
         dtm: scipy.sparse.csr.csr_matrix,
         embeddings: Optional[np.ndarray] = None,
         image_embeddings: Optional[np.ndarray] = None,
-        # is_inference: bool = False,
     ):
         self.dtm = dtm
         self.embeddings = embeddings
         self.image_embeddings = image_embeddings
-        # self.is_inference = is_inference
 
     def __len__(self):
         return self.dtm.shape[0]
@@ -51,86 +49,6 @@ class M3LDataset(Dataset):
                 self.image_embeddings[i, :]
             )
         return res_dict
-
-
-class LegacyM3LDataset(Dataset):
-    """Class to load BoW and the contextualized embeddings for *aligned multilingual* datasets"""
-
-    def __init__(
-        self,
-        X_contextual,
-        X_bow,
-        X_image_emb,
-        idx2token,
-        is_inference=False,
-    ):
-        # during training, data is multilingual AND multimodal
-        # during inference, data is monolingual AND monomodal (either image or text)
-        self.X_bow = X_bow
-        self.X_contextual = X_contextual
-        self.X_image = X_image_emb
-        self.idx2token = idx2token
-        self.inference_mode = is_inference
-
-    def __len__(self):
-        """Return length of dataset."""
-        # during training, X_bow, X_contextual and X_image are all available
-        if self.inference_mode is False:
-            return self.X_contextual[0].shape[0]
-        # during inference, either X_contextual or X_image is available, not both
-        else:
-            if self.X_contextual is not None:
-                return self.X_contextual.shape[0]
-            else:
-                return self.X_image.shape[0]
-
-    def __getitem__(self, i):
-        """Return sample from dataset at index i."""
-        # TRAINING: dataset is multimodal AND multilingual (X_contextual will have 1 extra row for the image embedding)
-        if self.inference_mode is False:
-            if isinstance(self.X_bow[0][i], scipy.sparse.csr.csr_matrix):
-                X_bow_collect = []
-                X_contextual_collect = []
-                for l in range(self.num_lang):
-                    X_bow = torch.FloatTensor(self.X_bow[l][i].todense())
-                    X_contextual = torch.FloatTensor(self.X_contextual[l][i])
-                    X_bow_collect.append(X_bow)
-                    X_contextual_collect.append(X_contextual)
-                # X_bow_collect: L x vocab_size
-                X_bow_collect = torch.stack(X_bow_collect)
-                # X_contextual_collect: L x bert_dim
-                X_contextual_collect = torch.stack(X_contextual_collect)
-                # X_image: bert_dim
-                X_image = torch.FloatTensor(self.X_image[i])
-            else:
-                X_bow_collect = []
-                X_contextual_collect = []
-                for l in range(self.num_lang):
-                    X_bow = torch.FloatTensor(self.X_bow[i])
-                    X_contextual = torch.FloatTensor(self.X_contextual[i])
-                    X_bow_collect.append(X_bow)
-                    X_contextual_collect.append(X_contextual)
-                # X_bow_collect: L x vocab_size
-                X_bow_collect = torch.stack(X_bow_collect)
-                # X_contextual_collect: L x bert_dim
-                X_contextual_collect = torch.stack(X_contextual_collect)
-                # X_image: bert_dim
-                X_image = torch.FloatTensor(self.X_image[i])
-            return_dict = {
-                "X_bow": X_bow_collect,
-                "X_contextual": X_contextual_collect,
-                "X_image": X_image,
-            }
-        # INFERENCE: dataset is monolingual AND monomodal (either text or image)
-        else:
-            # X_bow is just a dummy variable
-            X_bow = torch.FloatTensor(torch.rand(10))
-            if self.X_contextual is not None:
-                X_test = torch.FloatTensor(self.X_contextual[i])
-            else:
-                X_test = torch.FloatTensor(self.X_image[i])
-            return_dict = {"X_contextual": X_test, "X_bow": X_bow}
-        return return_dict
 
 
 class ContextualInferenceNetwork(nn.Module):
