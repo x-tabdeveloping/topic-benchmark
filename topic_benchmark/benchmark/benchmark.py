@@ -92,6 +92,7 @@ def run_benchmark(
     seeds: tuple[int] = (42),
     prev_entries: Iterable[BenchmarkEntry] = (),
     multimodal: bool = False,
+    strict: bool = False,
 ) -> Iterable[BenchmarkEntry]:
     done = set(
         [
@@ -192,15 +193,18 @@ def run_benchmark(
                             results=res,
                         )
                     except Exception as e:
-                        warnings.warn(
-                            f"Entry {current_id} failed due to error: {e}\n"
-                            + "Error Trace: \n"
-                            + traceback.format_exc()
-                        )
-                        yield BenchmarkEntry.error(
-                            dataset=dataset_name,
-                            seed=seed,
-                            model=model_name,
-                            error_message=str(e),
-                            n_topics=n_components,
-                        )
+                        if strict:
+                            raise e
+                        else:
+                            warnings.warn(
+                                f"Entry {current_id} failed due to error: {e}\n"
+                                + "Error Trace: \n"
+                                + traceback.format_exc()
+                            )
+                            yield BenchmarkEntry.error(
+                                dataset=dataset_name,
+                                seed=seed,
+                                model=model_name,
+                                error_message=str(e),
+                                n_topics=n_components,
+                            )

@@ -72,6 +72,10 @@ cli = Radicli()
         "--multimodal",
         help="Indicates whether the benchmark should be multimodal or not.",
     ),
+    strict=Arg(
+        "--strict",
+        help="Indicates whether the benchmark should fail upon error or not.",
+    ),
 )
 def run_cli(
     out_dir: str = "results/",
@@ -81,6 +85,7 @@ def run_cli(
     metrics: Optional[list[str]] = None,
     seeds: Optional[list[int]] = None,
     multimodal: bool = False,
+    strict: bool = False,
 ):
     vectorizer = default_vectorizer()
 
@@ -122,6 +127,7 @@ def run_cli(
             seeds,
             prev_entries=cached_entries,
             multimodal=multimodal,
+            strict=strict,
         )
         for entry in entries:
             with open(out_path, "a") as out_file:
