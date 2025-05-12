@@ -19,21 +19,23 @@ pip install topic-benchmark
 
 #### `run`
 
-Run the benchmark. Defaults to running all models with the benchmark used in Kardos et al. (2024).
+Run the benchmark.
 
 ```bash
 python3 -m topic_benchmark run
 ```
 
-| Argument               | Short Flag | Description                                                                                              | Type                                   | Default         |
-|------------------------|------------|----------------------------------------------------------------------------------------------------------|----------------------------------------|-----------------|
-| `--out_dir OUT_DIR`    | `-o`       | Output directory for the results.                                                                        | `str`                                  | `results/`      |
-| `--encoders ENCODERS`  | `-e`       | Which encoders should be used for conducting runs?                                                       | `str`                                  | `None`          |
-| `--models MODELS`      | `-m`       | What subsection of models should the benchmark be run on.                                                | `Optional[list[str], NoneType]`        | `None`          |
-| `--datasets DATASETS`  | `-d`       | What datasets should the models be evaluated on.                                                         | `Optional[list[str], NoneType]`        | `None`          |
-| `--metrics METRICS`    | `-t`       | What metrics should the models be evaluated on.                                                          | `Optional[list[str], NoneType]`        | `None`          |
-| `--seeds SEEDS`        | `-s`       | What seeds should the models be evaluated on.                                                            | `Optional[list[int], NoneType]`        | `None`          |
-
+| Option                   | Short Flag | Type                  | Optional | Description                                                                 | Default      |
+|--------------------------|------------|-----------------------|----------|-----------------------------------------------------------------------------|---------------|
+| `--help`                 | `-h`       | Flag (bool)           | Yes      | Show this help message and exit                                             | —             |
+| `--out_dir OUT_DIR`      | `-o`       | `str`                 | Yes      | Output directory for the results                                            | `results/`    |
+| `--encoders ENCODERS`    | `-e`       | `str`                 | Yes      | Which encoders should be used for conducting runs                           | `None`        |
+| `--models MODELS`        | `-m`       | `list[str]` or `None` | Yes      | Subsection of models to benchmark                                           | `None`        |
+| `--datasets DATASETS`    | `-d`       | `list[str]` or `None` | Yes      | Datasets to evaluate models on                                              | `None`        |
+| `--metrics METRICS`      | `-t`       | `list[str]` or `None` | Yes      | Metrics to evaluate models on                                               | `None`        |
+| `--seeds SEEDS`          | `-s`       | `list[int]` or `None` | Yes      | Seeds to evaluate models on                                                 | `None`        |
+| `--multimodal`           | —          | `bool` (flag)         | Yes      | Indicates if the benchmark should be multimodal                             | `False`       |
+| `--strict`               | —          | `bool` (flag)         | Yes      | Indicates if the benchmark should fail on error                             | `False`       |
 
 ### Push to hub
 
