@@ -177,7 +177,7 @@ def run_benchmark(
                         end_time = time.time()
                         res = evaluate_topics(
                             topic_data,
-                            metrics=metrics,
+                            metric_fns=metric_fns,
                             dataset_name=dataset_name,
                         )
                         yield BenchmarkEntry(
