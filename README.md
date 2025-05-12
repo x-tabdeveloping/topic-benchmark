@@ -54,8 +54,10 @@ To reproduce the results reported in our paper, please do the following.
 
 First, install this package by running the following command:
 
+> Note: We used an older version of the package for the $S^3$ paper, and have introduced breaking changes since then. Please use version 0.6.0 if you intend to get the same result format.
+
 ```bash
-pip install topic-benchmark
+pip install topic-benchmark==0.6.0
 python3 -m topic-benchmark run -o results/
 ```
 
