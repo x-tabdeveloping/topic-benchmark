@@ -1,5 +1,6 @@
 import io
 import time
+import traceback
 import warnings
 from contextlib import redirect_stdout
 from typing import Callable, Iterable, Optional, Union
@@ -92,7 +93,13 @@ def run_benchmark(
     prev_entries: Iterable[BenchmarkEntry] = (),
     multimodal: bool = False,
 ) -> Iterable[BenchmarkEntry]:
-    done = set([entry.entry_id for entry in prev_entries])
+    done = set(
+        [
+            entry.entry_id
+            for entry in prev_entries
+            if entry.error_message is None
+        ]
+    )
     if multimodal and (datasets is None):
         datasets = MBEIR_TASKS
     print("Loading metrics...")
@@ -186,7 +193,9 @@ def run_benchmark(
                         )
                     except Exception as e:
                         warnings.warn(
-                            f"Entry {current_id} failed due to error: {e}"
+                            f"Entry {current_id} failed due to error: {e}\n"
+                            + "Error Trace: \n"
+                            + traceback.format_exc()
                         )
                         yield BenchmarkEntry.error(
                             dataset=dataset_name,
