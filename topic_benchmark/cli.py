@@ -9,7 +9,6 @@ from sentence_transformers import SentenceTransformer
 from topic_benchmark.benchmark import BenchmarkEntry, run_benchmark
 from topic_benchmark.defaults import default_vectorizer
 from topic_benchmark.registries import encoder_registry
-from topic_benchmark.table import produce_full_table
 
 
 def load_cache(file: Path) -> list[BenchmarkEntry]:
@@ -133,37 +132,6 @@ def run_cli(
             with open(out_path, "a") as out_file:
                 out_file.write(entry.to_json() + "\n")
     print("DONE")
-
-
-@cli.command(
-    "table",
-    results_folder=Arg(
-        help="Folder containing results for all embedding models."
-    ),
-    out_path=Arg("--out_file", "-o"),
-)
-def make_table(
-    results_folder: str = "results/", out_path: Optional[str] = None
-):
-    results_folder = Path(results_folder)
-    files = results_folder.glob("*.jsonl")
-    encoder_entries = dict()
-    for result_file in files:
-        encoder_name = Path(result_file).stem.replace("__", "/")
-        with open(result_file) as in_file:
-            # Allows for comments if we want to exclude models.
-            entries = [
-                json.loads(line)
-                for line in in_file
-                if not line.startswith("#")
-            ]
-        encoder_entries[encoder_name] = entries
-    table = produce_full_table(encoder_entries)
-    if out_path is None:
-        print(table)
-    else:
-        with open(out_path, "w") as out_file:
-            out_file.write(table)
 
 
 def stream_results(results_folder: str) -> Iterable[dict]:
