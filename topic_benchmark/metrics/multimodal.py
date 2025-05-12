@@ -37,7 +37,7 @@ def encode_descriptives(
                 continue
             embeddings.extend(encoder.get_image_embeddings(images).tolist())
             labels.extend([name] * len(images))
-    except ValueError:
+    except Exception:
         warnings.warn("No images, proceeding without them.")
         pass
     embeddings = np.array(embeddings)
