@@ -34,7 +34,7 @@ def load_newsgroups_raw() -> list[str]:
 
 OUT_FOLDER = Path(__file__).parent.joinpath("__test_results")
 
-METRICS = ["wec_in", "coverage", "diversity", "silhouette"]
+METRICS = ["wec_in", "coverage", "diversity", "silhouette", "stop_freq"]
 
 
 def test_monomodal():
