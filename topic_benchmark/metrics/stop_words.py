@@ -21,8 +21,7 @@ def stop_word_rel_freq(topic_descriptions: list[list[str]]) -> float:
 
 
 @metric_registry.register("stop_freq")
-def load_stop_freq() -> Metric:
-    top_k = 10
+def load_stop_freq(top_k: int = 10) -> Metric:
 
     def score(data: TopicData, dataset_name: Optional[str]):
         top_words = data.get_top_words(top_k=top_k)

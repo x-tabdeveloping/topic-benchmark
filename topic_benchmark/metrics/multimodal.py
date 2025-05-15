@@ -46,8 +46,7 @@ def encode_descriptives(
 
 
 @metric_registry.register("silhouette")
-def load_silhouette() -> Metric:
-    top_k = 10
+def load_silhouette(top_k: int = 10) -> Metric:
     encoder = CLIPModelWrapper("openai/clip-vit-base-patch32")
 
     def score(data: TopicData, dataset_name: Optional[str]):
@@ -59,8 +58,7 @@ def load_silhouette() -> Metric:
 
 
 @metric_registry.register("coverage")
-def load_coverage() -> Metric:
-    top_k = 10
+def load_coverage(top_k: int = 10) -> Metric:
     encoder = CLIPModelWrapper("openai/clip-vit-base-patch32")
 
     # Cache for dataset embeddings

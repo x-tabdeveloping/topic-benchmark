@@ -9,8 +9,7 @@ from topic_benchmark.utils import get_top_k
 
 
 @metric_registry.register("diversity")
-def load_diversity() -> Metric:
-    top_k = 10
+def load_diversity(top_k: int = 10) -> Metric:
 
     def score(data: TopicData, dataset_name: Optional[str]) -> float:
         topics = get_top_k(data, top_k)
