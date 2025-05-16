@@ -15,7 +15,8 @@ METRICS = [
     "wec_ex",
     "coverage",
     "diversity",
-    "silhouette",
+    "mec",
+    "med",
     "stop_freq",
 ]
 DATASETS = [

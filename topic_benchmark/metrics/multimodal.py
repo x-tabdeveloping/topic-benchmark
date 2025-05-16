@@ -1,3 +1,4 @@
+import itertools
 import warnings
 from typing import Optional
 
@@ -53,6 +54,45 @@ def load_silhouette(top_k: int = 10) -> Metric:
         embeddings, labels = encode_descriptives(data, top_k, encoder)
         res = silhouette_score(embeddings, labels, metric="cosine")
         return float(res)
+
+    return score
+
+
+@metric_registry.register("mec")
+def load_multimodal_embedding_coherence(top_k: int = 10) -> Metric:
+    encoder = CLIPModelWrapper("openai/clip-vit-base-patch32")
+
+    def score(data: TopicData, dataset_name: Optional[str]):
+        embeddings, labels = encode_descriptives(data, top_k, encoder)
+        sims = []
+        for label in np.unique(labels):
+            topic_embeddings = embeddings[labels == label]
+            sim = cosine_similarity(topic_embeddings, topic_embeddings)
+            sim[np.triu_indices(sim.shape[0], 0)] = np.nan
+            sims.append(np.nanmean(sim))
+        return float(np.nanmean(sims))
+
+    return score
+
+
+@metric_registry.register("med")
+def load_multimodal_embedding_diversity(top_k: int = 10) -> Metric:
+    encoder = CLIPModelWrapper("openai/clip-vit-base-patch32")
+
+    def score(data: TopicData, dataset_name: Optional[str]):
+        embeddings, labels = encode_descriptives(data, top_k, encoder)
+        topic_embeddings = [
+            embeddings[labels == label] for label in np.unique(labels)
+        ]
+        topic_dist = []
+        for i_topic, j_topic in itertools.combinations(
+            np.arange(len(topic_embeddings)), 2
+        ):
+            dist = 1 - cosine_similarity(
+                topic_embeddings[i_topic], topic_embeddings[j_topic]
+            )
+            topic_dist.append(np.mean(dist))
+        return float(np.nanmean(topic_dist))
 
     return score
 
