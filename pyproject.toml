@@ -6,7 +6,7 @@ line-length=79
 
 [tool.poetry]
 name = "topic-benchmark"
-version = "0.6.0"
+version = "1.0.0"
 description = "CLI suite for benchmarking topic models"
 authors = ["Márton Kardos <power.up1163@gmail.com>"]
 license = "MIT"
@@ -18,10 +18,10 @@ numpy = ">=1.23.0"
 scikit-learn = ">=1.2.0"
 sentence-transformers = ">=3.0.0"
 torch = "^2.1.0"
-scipy = "~1.10.0"
+scipy = ">=1.10.0"
 rich = "^13.6.0"
 pyro-ppl = "^1.8.0"
-turftopic = ">=0.5.3"
+turftopic = ">=0.16.0"
 umap-learn = "^0.5.0"
 hdbscan = "^0.8.0"
 catalogue = "^2.0.0"
@@ -29,6 +29,8 @@ gensim = "^4.3.2"
 radicli = "^0.0.25"
 pandas = "^2.1.0"
 datasets="^2.18.0"
+msgspec="^0.19.0"
+pytorch-metric-learning = "^2.8.1"
 
 [build-system]
 requires = ["poetry-core"]

@@ -27,6 +27,7 @@ def load_top2vec(encoder, vectorizer: CountVectorizer) -> Loader:
             clustering=clustering,
             feature_importance="centroid",
             reduction_method="smallest",
+            reduction_topic_representation="centroid",
             n_reduce_to=n_components,
         )
 

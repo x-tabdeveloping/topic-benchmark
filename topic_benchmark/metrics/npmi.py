@@ -11,8 +11,7 @@ from topic_benchmark.utils import get_top_k
 
 
 @metric_registry.register("c_npmi")
-def load_npmi() -> Metric:
-    top_k = 10
+def load_npmi(top_k: int = 10) -> Metric:
 
     def score(data: TopicData, dataset_name: Optional[str]):
         topics = get_top_k(data, top_k)

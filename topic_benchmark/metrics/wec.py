@@ -25,8 +25,7 @@ def word_embedding_coherence(topics, wv):
 
 
 @metric_registry.register("wec_ex")
-def load_wec() -> Metric:
-    top_k = 10
+def load_wec(top_k: int = 10) -> Metric:
     wv = api.load("word2vec-google-news-300")
 
     def score(data: TopicData, dataset_name: Optional[str]):
@@ -37,11 +36,10 @@ def load_wec() -> Metric:
 
 
 @metric_registry.register("wec_in")
-def load_iwec() -> Metric:
+def load_iwec(top_k: int = 10) -> Metric:
     """Internal word embedding coherence:
     Trains word2vec model on the corpus, then uses it to evaluate
     based on WEC."""
-    top_k = 10
 
     # Cache for w2v models over corpora
     w2v_cache: dict[str, Word2Vec] = {}
